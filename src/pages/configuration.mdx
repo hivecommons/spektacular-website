@@ -31,6 +31,10 @@ import Button from "../components/Button.astro";
   </Fragment>
 
   ```yaml
+  schema: 3                       # settings format version; `migrate` raises it
+  written_by: 0.16.0              # the Spektacular version that last wrote this file
+  skills_version: 0.16.0          # the Spektacular version that installed the agent skills
+
   command: spektacular
   agent: claude
   spec_trigger_threshold: moderate
@@ -42,17 +46,17 @@ import Button from "../components/Button.astro";
     provider: file
     id_method: timestamp
     config:
-      directory: .spektacular/specs
+      directory: specs            # relative to the folder holding `config.yaml`
 
   plan:
     provider: file
     config:
-      directory: .spektacular/plans
+      directory: plans
 
   changelog:
     provider: file
     config:
-      directory: .spektacular/changelog
+      directory: changelog
 
   knowledge:
     sources:                        # the project's shared stores only; each
@@ -73,11 +77,37 @@ import Button from "../components/Button.astro";
 
   <Fragment slot="sub">
 
-    Nine top-level sections control the tool from `.spektacular/config.yaml`:
-    `command`, `agent`, `spec_trigger_threshold`, `debug`, `spec`, `plan`,
-    `changelog`, `knowledge`, and `repos`.
+    Twelve top-level keys control the tool from `.spektacular/config.yaml`:
+    `schema`, `written_by`, `skills_version`, `command`, `agent`,
+    `spec_trigger_threshold`, `debug`, `spec`, `plan`, `changelog`,
+    `knowledge`, and `repos`.
 
   </Fragment>
+
+  <ConfigKey name="schema" type="integer" defaultValue="written by Spektacular">
+
+    The settings format version. Never edit it by hand; `migrate` raises it.
+    A file with no `schema` is read as the oldest format and needs an
+    upgrade, as described under Upgrading a project below.
+
+  </ConfigKey>
+
+  <ConfigKey name="written_by" type="string" defaultValue="written by Spektacular">
+
+    The Spektacular version that last saved this file. Informational only:
+    it never triggers an upgrade, so a file written by a different version
+    of the same format is left alone.
+
+  </ConfigKey>
+
+  <ConfigKey name="skills_version" type="string" defaultValue="written by Spektacular">
+
+    The Spektacular version that last installed your agent skills. Only
+    `init` and `migrate` set it, so rewriting the file for any other reason,
+    registering a repository for example, leaves it untouched. When it
+    differs from the running Spektacular, commands stop until you upgrade.
+
+  </ConfigKey>
 
   <ConfigKey name="command" type="string" defaultValue="<code>spektacular</code>">
 
@@ -116,7 +146,7 @@ import Button from "../components/Button.astro";
 
   </ConfigKey>
 
-  <ConfigKey name="spec" type="section" defaultValue="file provider, timestamp IDs, <code>.spektacular/specs</code>">
+  <ConfigKey name="spec" type="section" defaultValue="file provider, timestamp IDs, <code>specs</code>">
 
     How specs are stored and identified.
 
@@ -125,41 +155,45 @@ import Button from "../components/Button.astro";
       `counter` (sequential numbers), or `external` (the caller supplies an
       `id` with each spec).
     - `spec.config.directory`: where the file provider writes specs. Defaults
-      to `.spektacular/specs`.
+      to `specs`, relative to the folder holding `config.yaml` (the same rule as
+      `repos[].location`), so specs land in `.spektacular/specs`. A directory
+      outside the project is refused.
 
     Every spec record also carries lifecycle metadata: a created date, a
-    status, and, once resolved, a closed date, tracked automatically without
-    any extra configuration.
+    document status, and, once resolved, a closed date, tracked automatically
+    without any extra configuration.
 
   </ConfigKey>
 
-  <ConfigKey name="plan" type="section" defaultValue="file provider, <code>.spektacular/plans</code>">
+  <ConfigKey name="plan" type="section" defaultValue="file provider, <code>plans</code>">
 
     How plans are stored.
 
     - `plan.provider`: storage backend; only `file` ships today.
     - `plan.config.directory`: where the file provider writes plans. Defaults
-      to `.spektacular/plans`.
+      to `plans`, relative to the folder holding `config.yaml`, so plans land in
+      `.spektacular/plans`.
 
     Every plan record also carries lifecycle metadata: a created date, a
-    status, and, once resolved, a closed date, tracked automatically without
-    any extra configuration.
+    document status, and, once resolved, a closed date, tracked automatically
+    without any extra configuration.
 
   </ConfigKey>
 
-  <ConfigKey name="changelog" type="section" defaultValue="file provider, <code>.spektacular/changelog</code>">
+  <ConfigKey name="changelog" type="section" defaultValue="file provider, <code>changelog</code>">
 
     How completed-feature changelog records are stored.
 
     - `changelog.provider`: storage backend; only `file` ships today.
     - `changelog.config.directory`: where the file provider writes changelog
-      records. Defaults to `.spektacular/changelog`.
+      records. Defaults to `changelog`, relative to the folder holding
+      config.yaml, so records land in `.spektacular/changelog`.
 
     A record is written automatically at the end of every `implement` run,
     one flat markdown file per feature, covering what was built, why it
     matters, and how the outcome differed from the plan. Every changelog
     record also carries the same lifecycle metadata as specs and plans: a
-    created date, a status, and, once resolved, a closed date.
+    created date, a document status, and, once resolved, a closed date.
 
   </ConfigKey>
 
@@ -232,6 +266,9 @@ import Button from "../components/Button.astro";
   </Fragment>
 
   ```yaml
+  schema: 2                        # settings format version; `migrate` raises it
+  written_by: 0.16.0               # the Spektacular version that last wrote this file
+
   description: Marketing and documentation site, built with Astro
   role: documentation
   tags:
@@ -267,6 +304,20 @@ import Button from "../components/Button.astro";
     source included, resolves from the folder holding the file.
 
   </Fragment>
+
+  <ConfigKey name="schema" type="integer" defaultValue="written by Spektacular">
+
+    The settings format version of this `repo.yaml`, on its own count: a
+    repository file at format 2 sits beside a project file at format 3.
+    `migrate` raises it for every registered repository present on disk.
+
+  </ConfigKey>
+
+  <ConfigKey name="written_by" type="string" defaultValue="written by Spektacular">
+
+    The Spektacular version that last saved this file, for diagnosis only.
+
+  </ConfigKey>
 
   <ConfigKey name="description" type="string" defaultValue="none">
 
@@ -331,6 +382,50 @@ import Button from "../components/Button.astro";
   </ConfigKey>
 
 </ConfigurationKeys>
+
+<Section heading="Upgrading a project: migrate" surface={false}>
+
+  <Fragment slot="sub">
+
+    Every settings file records the format version it was written in. When a
+    release changes that format, or when you install a newer Spektacular than
+    the one that installed your agent skills, commands stop with an error
+    naming `migrate` until the project is brought up to date. `migrate`,
+    `init`, `version check` and `help` always run, so the way out is always
+    reachable.
+
+  </Fragment>
+
+  Preview every change first, which touches nothing on disk:
+
+  ```bash
+  spektacular migrate --dry-run
+  ```
+
+  Then apply it:
+
+  ```bash
+  spektacular migrate
+  ```
+
+  One run:
+
+  - upgrades `config.yaml` and every registered repository's `repo.yaml`
+    present on disk, through as many formats as each file is behind
+  - keeps a `.v<N>.old` copy of each file it rewrites, named after the
+    format the file started at
+  - skips repositories that are not checked out locally and names each one;
+    they are upgraded the next time they are set up
+  - reinstalls the agent skills when they are older than the running
+    Spektacular, and records the new version only once that install succeeds
+
+  Re-running `spektacular init <agent>` applies the same upgrades before it
+  does anything else, so an existing project can also be brought current by
+  setting it up again. A file written by a *newer* Spektacular is refused
+  rather than converted: the error asks you to update Spektacular, and the
+  file is never rewritten.
+
+</Section>
 
 <CtaBanner
   heading="Pluggable by design"

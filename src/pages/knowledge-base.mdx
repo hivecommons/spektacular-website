@@ -158,13 +158,17 @@ import Button from "../components/Button.astro";
 <Section heading="How a search is ranked" surface>
 
   <Fragment slot="sub">
-
-    Matching is no longer all or nothing. An entry is returned if it carries
-    evidence for any of your query terms, and ranked on how good a match it is.
-
+    To enable the effective retrieval of knowledge base entries, Spektacular
+    uses a search algorithm that is based on the content of the knowledge base
+    entry and any tags that are associated with it.
   </Fragment>
 
   <Prose nested>
+    During the planning process the agent prompts within Spektacular
+    instruct the agent to search the knowledge base for entries that provide 
+    information to the task in hand.
+
+    The search query 
 
   **How a query becomes terms.** Your query is lower-cased and split on
   whitespace into terms. There is no stemming, no synonyms and no plural
