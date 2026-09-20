@@ -1,5 +1,6 @@
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
+import sitemap from "@astrojs/sitemap";
 import astroExpressiveCode from "astro-expressive-code";
 import tailwindcss from "@tailwindcss/vite";
 
@@ -7,7 +8,7 @@ export default defineConfig({
   site: "https://spektacular.dev",
   // astroExpressiveCode must come before mdx() so it processes fenced code
   // blocks in .mdx files before MDX hands them off.
-  integrations: [astroExpressiveCode(), mdx()],
+  integrations: [astroExpressiveCode(), mdx(), sitemap()],
   vite: {
     plugins: [tailwindcss()],
   },
