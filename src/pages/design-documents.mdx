@@ -1,0 +1,440 @@
+---
+layout: ../layouts/Shell.astro
+title: "Design Documents - Spektacular"
+description: "What a design document is, when to reach for one instead of putting the detail in a spec, and how Spektacular resolves, reads and references them."
+---
+import Hero from "../components/sections/Hero.astro";
+import Section from "../components/sections/Section.astro";
+import Prose from "../components/sections/Prose.astro";
+import CtaBanner from "../components/sections/CtaBanner.astro";
+import Button from "../components/Button.astro";
+
+<Hero
+  heading="Design Documents"
+  sub="The worked design a feature is built to, kept where your team already keeps it, and bound to the spec that needs it."
+/>
+
+<Section heading="What a design document is">
+
+  <Prose nested>
+
+  A design document holds the settled shape of something: an API, a user-facing
+  flow, a data format, or a worked example of one. It is the detail a spec needs
+  to be built correctly but cannot carry without becoming unreadable.
+
+  Spektacular owns the **reference**, not the document. It resolves a declared
+  source to a folder, reads and writes bytes there, and reports a reference it
+  cannot resolve. It never imposes a structure on a design document's content,
+  whoever wrote it.
+
+  Beyond that, there are two kinds of design document and they are treated
+  differently. A design your team already had is never changed. It gains no
+  frontmatter, is never reformatted, and comes back byte for byte as you
+  supplied it, so a folder of designs you already keep is read exactly as it
+  stands. A design Spektacular authors with you is different: it carries the
+  same lifecycle record every spec and plan carries, so you can see where it
+  stands, which spec's conversation produced it, and which specs depend on it.
+
+  That is why design documents are declared rather than filed. You point
+  Spektacular at wherever your designs already live, give each place a name, and
+  reach the documents there by that name. Nothing moves.
+
+  </Prose>
+
+</Section>
+
+<Section heading="When to use one instead of a spec section" surface>
+
+  <Fragment slot="sub">
+
+    A design document is not a second home for anything technical that came up.
+    Three tests decide it, and all three have to hold.
+
+  </Fragment>
+
+  <Prose nested>
+
+  - **Is it settled?** The decision has been made, not floated. An option still
+    under discussion is not a design.
+  - **Is it worked?** A concrete shape, format or flow, rather than a direction.
+    "Use an embedded datastore" is direction. A field-by-field request and
+    response body is worked.
+  - **Would it make the spec unreadable inline?** If a one-line steer captures
+    it, that steer belongs in the spec and there is no design document to write.
+
+  Where the detail lands if a test fails is not arbitrary:
+
+  - A hard boundary the solution must honour is a **constraint**, and stays in
+    the spec.
+  - A preference the planner may adapt is **technical direction**, and stays in
+    the spec as a one-line steer.
+  - A worked design that would swamp the spec is a **design document**, and the
+    spec points at it.
+
+  The discipline once you split is to summarise and link, never to restate. A
+  spec that describes the design and references it has two sources of truth that
+  will disagree within a month.
+
+  </Prose>
+
+</Section>
+
+<Section heading="Working a design out with Spektacular">
+
+  <Fragment slot="sub">
+
+    A design you have not written yet is worked out in conversation, then
+    written down, rather than being left for you to draft alone.
+
+  </Fragment>
+
+  <Prose nested>
+
+  Not every design arrives finished. Where the shape of something has been
+  settled in conversation but never written down, Spektacular can help you work
+  it out and then write the document from it. That is a guided interview: it
+  states what it is trying to learn, asks questions that follow from your
+  answers rather than working through a fixed list, and stops.
+
+  It is the same Flipped Interaction pattern the spec workflow uses for its own
+  interview, aimed at a different goal: understanding the design well enough to
+  write a document someone could build from.
+
+  The stopping condition is the part that matters most in practice. The
+  interview ends once a further answer would not change the document, not once
+  every conceivable detail has been asked about. What gets written is the
+  design, not a transcript of the conversation that produced it, so an authored
+  design is the size of the design rather than the size of the discussion.
+
+  ```
+  Agent:  You have described the shape of the retry policy twice now, and it is
+          settled. Shall I help you write it up as a design document?
+  You:    yes
+  Agent:  What triggers a retry: any failure, or only specific ones?
+  You:    only 5xx and timeouts, never a 4xx
+  Agent:  And what stops it retrying forever?
+  You:    three attempts, doubling the wait each time
+  Agent:  That is enough to write it. Nothing further would change the
+          document. Here is the draft, shall I store it?
+  ```
+
+  Nothing is written without your explicit agreement, and declining leaves no
+  file behind. A design can be authored before any spec exists; the reference
+  is recorded later, if a spec ever needs one.
+
+  </Prose>
+
+</Section>
+
+<Section heading="What an authored design records" surface>
+
+  <Fragment slot="sub">
+
+    The lifecycle record on a design Spektacular wrote with you, field by
+    field.
+
+  </Fragment>
+
+  <Prose nested>
+
+  A design Spektacular authors carries the same frontmatter block every spec
+  and plan carries:
+
+  - **Capture date**: when the design was written. Stamped once, on the first
+    write, and preserved through every later revision.
+  - **Document status**: where it stands, one of `draft`, `final`,
+    `superseded` or `archived`. The same four values every other Spektacular
+    document uses.
+  - **Originating spec**: the spec whose conversation produced it, when there
+    was one. A design authored outside a spec simply does not carry this.
+  - **Referencing specs**: every spec that references it, kept in step
+    automatically as references are added and removed.
+
+  ```yaml
+  ---
+  created_date: "2026-09-21"
+  document_status: draft
+  spec: 000055_design-authoring-skill
+  specs:
+      - 000055_design-authoring-skill
+  ---
+  ```
+
+  A design your team already had carries no such block at all. That is the
+  difference between the two kinds, and it is also how Spektacular tells them
+  apart: the document itself is the record, so there is nothing else to keep in
+  step with it. Listing a source shows both side by side, an authored design
+  reporting its status and provenance, one of yours reporting nothing but where
+  it lives.
+
+  </Prose>
+
+</Section>
+
+<Section heading="How they relate to specs and plans">
+
+  <Fragment slot="sub">
+
+    A design binds the work without being copied into it, and the binding runs
+    in one direction only.
+
+  </Fragment>
+
+  <Prose nested>
+
+  **A spec records references.** Each one names both the source it belongs to
+  and the document within that source, so it can always be resolved back to a
+  real place. References live in the spec's own record rather than its prose,
+  which is what makes them validated when written and durable afterwards: they
+  survive the spec being rewritten.
+
+  **A plan resolves and reads every one before designing.** The plan workflow is
+  obliged to read each referenced design in full, to build on it rather than
+  re-derive it, and to name each document and the source it came from in the
+  finished plan's dependencies. A design you referenced is guaranteed a reader.
+
+  **Once the work ships, the design is a historical record.** Nothing requires a
+  shipped design to match the implementation, and no command rewrites one to
+  make it match. It records what was agreed.
+
+  A design document holds no back-links, so any number of specs may reference
+  the same design and it outlives the feature that introduced it. Here is how a
+  spec carries its references:
+
+  ```yaml
+  ---
+  created_date: "2026-09-20"
+  document_status: final
+  designs:
+    - source: api
+      path: payments/v2.md
+  ---
+  ```
+
+  </Prose>
+
+</Section>
+
+<Section heading="Declaring where designs live" surface>
+
+  <Fragment slot="sub">
+
+    Design sources are declared by the project, in `config.yaml`. A repository
+    does not declare its own.
+
+  </Fragment>
+
+  <Prose nested>
+
+  Each source has a name it is addressed by, a provider, and a location. A
+  relative location resolves from the folder holding `config.yaml`, the same
+  base every other relative path in that file uses. An absolute location is
+  used as written, and neither has to sit inside the project.
+
+  ```yaml
+  design:
+    sources:
+      - name: api
+        provider: file
+        config:
+          location: ../design/api
+      - name: ux
+        provider: file
+        config:
+          location: ${HOME}/work/ux-designs
+  ```
+
+  Only the `file` provider ships today. A source naming any other provider is
+  refused by name rather than ignored, and a location that is not a directory is
+  refused when the source is first resolved, naming the path it resolved to and
+  the base it resolved from. The section is optional: a project that declares no
+  design sources behaves exactly as it did before.
+
+  See the [configuration reference](/configuration/) for the full key list.
+
+  </Prose>
+
+</Section>
+
+<Section heading="Working with designs from the command line">
+
+  <Fragment slot="sub">
+
+    Agents reach design documents through the CLI rather than by reading files
+    directly, as they already do for specs, plans and changelog records.
+
+  </Fragment>
+
+  <Prose nested>
+
+  The declared sources, with the absolute location each one resolved to:
+
+  ```bash
+  spektacular design sources
+  ```
+
+  Every design document, across all sources at once, each tagged with the
+  source it came from. Add `--source` to narrow to one:
+
+  ```bash
+  spektacular design list
+  spektacular design list --source api
+  ```
+
+  Read one document by naming its source and its path within that source. The
+  bytes go to stdout unchanged:
+
+  ```bash
+  spektacular design read --data '{"source":"api","path":"payments/v2.md"}'
+  ```
+
+  Write one into a declared source. The content comes from a file, and is stored
+  exactly as given:
+
+  ```bash
+  spektacular design write --data '{"source":"api","path":"payments/v2.md"}' --from ./draft.md
+  ```
+
+  Write one that Spektacular authored with you, stamping its lifecycle record.
+  Name the spec the conversation belonged to, and set a status, if either
+  applies:
+
+  ```bash
+  spektacular design author --data '{"source":"api","path":"payments/v2.md"}' --from ./draft.md
+  spektacular design author --data '{"source":"api","path":"payments/v2.md"}' --from ./draft.md --spec 000055_example --document-status final
+  ```
+
+  Use `design write` for a document you wrote and are handing over, and
+  `design author` for one Spektacular wrote with you. Re-running `design author`
+  on an existing authored design updates it in place, keeping its original
+  capture date and the specs already referencing it. Running `design write` over
+  an authored design is refused rather than silently stripping that record.
+
+  Record a reference on a spec, or remove one. A reference naming a source the
+  project has not declared is refused, and nothing is recorded:
+
+  ```bash
+  spektacular design ref add --data '{"spec":"000054_example","source":"api","path":"payments/v2.md"}'
+  spektacular design ref remove --data '{"spec":"000054_example","source":"api","path":"payments/v2.md"}'
+  ```
+
+  Ask what a spec references, and whether each reference resolves:
+
+  ```bash
+  spektacular design ref list --data '{"spec":"000054_example"}'
+  ```
+
+  ```json
+  {
+    "error": false,
+    "spec": "000054_example",
+    "refs": [
+      {
+        "source": "api",
+        "path": "payments/v2.md",
+        "resolved": true,
+        "location": "/work/design/api/payments/v2.md"
+      },
+      {
+        "source": "ux",
+        "path": "checkout-flow.md",
+        "resolved": false,
+        "location": "/work/ux-designs/checkout-flow.md"
+      }
+    ],
+    "unresolved": 1,
+    "next_action": "1 of 2 design references do not resolve; run 'design list' to see what each declared source holds, write the missing document with 'design write', or drop the reference with 'design ref remove'"
+  }
+  ```
+
+  </Prose>
+
+</Section>
+
+<Section heading="When a reference cannot be found" surface>
+
+  <Fragment slot="sub">
+
+    An unresolvable reference is reported while planning, not discovered
+    halfway through implementation.
+
+  </Fragment>
+
+  <Prose nested>
+
+  The two commands divide the work deliberately. `design ref list` always
+  succeeds, so a single call shows every reference a spec carries at once, with
+  the absolute location searched for each and a count of those that did not
+  resolve. That is the complete picture the plan workflow needs, and the plan
+  workflow stops and reports rather than planning around a gap.
+
+  `design read` is the hard failure. Reading a design that is not there returns
+  an error naming the source, the path, the absolute location searched, and the
+  command that lists what that source does hold:
+
+  ```json
+  {
+    "error": true,
+    "code": "design_not_found",
+    "message": "design source \"api\" holds no document at \"payments/v2.md\" (searched /work/design/api/payments/v2.md)",
+    "resource": "/work/design/api/payments/v2.md",
+    "next_action": "run 'design list --source api' to see what that source holds, or write the document with 'design write'"
+  }
+  ```
+
+  Recording or removing a reference is a change to two documents, the spec and
+  the design, and they are made to fail as a unit. If the design's own record
+  cannot be updated, the whole operation is refused and the spec is put back
+  exactly as it was, so a spec and a design are never left contradicting each
+  other. In the rare case that restoring the spec also fails, that is reported
+  as its own distinct outcome, naming both files to reconcile by hand, because
+  the corrective action is different from a simple retry.
+
+  A missing document and an undeclared source are different failures, on
+  purpose. One means the source does not exist, and names the sources that do.
+  The other means that source exists and does not hold this. Collapsing them
+  would leave a caller unable to tell a typo in a source name from a design that
+  was never written.
+
+  </Prose>
+
+</Section>
+
+<Section heading="Why it works this way">
+
+  <Prose nested>
+
+  **The spec stays readable because the design is referenced, not absorbed.**
+  The complaint that motivated design documents was specs that became unusable
+  once a worked API shape was pasted into them. A reference keeps the spec at
+  the altitude it reads best at while still binding the work to the design that
+  was agreed.
+
+  **A shipped design is never force-synced against the code.** There is no drift
+  detection, no checksums, and no command that requires a design to match the
+  implementation. A design records what was agreed at the time it was agreed.
+  Treating it as something to keep in step with the code would make it a second
+  copy of the code, which is exactly what nobody maintains.
+
+  **Storage is declared, not imposed.** Teams already keep designs somewhere: a
+  folder in the repo, a shared directory, a sibling checkout. Requiring them to
+  move into a Spektacular-owned directory would be the one thing guaranteed to
+  stop them adopting design documents at all. So you name the places, and
+  nothing moves.
+
+  </Prose>
+
+</Section>
+
+<CtaBanner heading="See it in the workflow">
+  <Fragment slot="body">
+    Design documents are read during planning, before any design work begins.
+    See where that sits in the spec-driven pipeline.
+  </Fragment>
+  <Button
+    href="/how-it-works/"
+    label="How it works →"
+    variant="primary"
+    large
+  />
+</CtaBanner>

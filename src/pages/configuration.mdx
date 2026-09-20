@@ -66,6 +66,13 @@ import Button from "../components/Button.astro";
           location: ${HOME}/work/team-knowledge   # or ../../team-knowledge,
                                                   # relative to this file
 
+  design:
+    sources:                        # where the project's design documents live;
+      - name: api                   # declared by the project, never by a repository
+        provider: file
+        config:
+          location: ../design/api   # relative to this file; may sit outside the project
+
   repos:
     - name: docs
       location: ../../docs/.spektacular
@@ -77,10 +84,10 @@ import Button from "../components/Button.astro";
 
   <Fragment slot="sub">
 
-    Twelve top-level keys control the tool from `.spektacular/config.yaml`:
+    Thirteen top-level keys control the tool from `.spektacular/config.yaml`:
     `schema`, `written_by`, `skills_version`, `command`, `agent`,
     `spec_trigger_threshold`, `debug`, `spec`, `plan`, `changelog`,
-    `knowledge`, and `repos`.
+    `knowledge`, `design`, and `repos`.
 
   </Fragment>
 
@@ -210,6 +217,30 @@ import Button from "../components/Button.astro";
     - `knowledge.sources[].config.location`: where the file provider reads
       knowledge from. Relative paths resolve from the folder holding
       `config.yaml`, the same base a `repos` entry uses.
+
+  </ConfigKey>
+
+  <ConfigKey name="design" type="section" defaultValue="none">
+
+    Ordered list of the design sources the project declares. A design document
+    holds the worked design a feature is built to, and a spec references one
+    rather than restating it. Design sources are declared by the project only;
+    a repository does not declare its own.
+
+    - `design.sources[].name`: the name this source is addressed by. Must be
+      unique among the project's design sources.
+    - `design.sources[].provider`: storage backend; only `file` ships today.
+    - `design.sources[].config.location`: where the file provider reads and
+      writes design documents. Relative paths resolve from the folder holding
+      `config.yaml`, the same base a `repos` entry uses. The location may sit
+      outside the project, and is never rewritten on save.
+
+    A source can hold both kinds of design document side by side. A design your
+    team already had is stored exactly as supplied, gaining no frontmatter and
+    never being reformatted; a design Spektacular authors with you carries the
+    same lifecycle record every spec and plan carries.
+
+    See the [Design Documents](/design-documents/) page for the full reference.
 
   </ConfigKey>
 
