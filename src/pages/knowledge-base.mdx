@@ -96,8 +96,8 @@ import Button from "../components/Button.astro";
   <Fragment slot="sub">
 
     Entries are plain markdown files, and you manage them through the
-    `spektacular knowledge` commands: create one, search and read it back, and
-    rewrite it when things change.
+    `spektacular knowledge` commands: create one, search and read it back,
+    rewrite it when things change, and remove it when it has had its day.
 
   </Fragment>
 
@@ -150,6 +150,27 @@ import Button from "../components/Button.astro";
   Because entries are identified by the exact bytes of their content, rewriting
   the same text changes nothing, while genuinely edited text supersedes the
   previous version.
+
+  **Removing.** An entry is removed with `knowledge delete`, addressed exactly as
+  a read or a write is: the tier, the store, and the path within that store.
+
+  ```bash
+  spektacular knowledge delete \
+    --data '{"tier": "repo", "name": "docs", "path": "gotchas/db-timeouts.md"}'
+  ```
+
+  Naming a store the project has not declared is refused, and the refusal lists
+  the stores available in that tier. Naming a path that simply holds nothing is
+  not an error: the removal reports success and changes nothing, so a maintenance
+  pass that retries is safe. The result says which of the two happened, so you can
+  tell a removal from a no-op without reading the store back.
+
+  The one entry that cannot be removed is a category's own `README.md`. It is
+  generated from the project's definition of that category rather than written by
+  anyone, so removing it would leave a gap nothing fills; the refusal points at
+  `spektacular init`, which regenerates it. Removal is immediate and there is no
+  undo, which is no worse than it sounds: every store in a normal setup is a
+  directory under version control, so recovery is whatever git already gives you.
 
   </Prose>
 

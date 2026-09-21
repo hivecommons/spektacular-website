@@ -310,6 +310,27 @@ import Button from "../components/Button.astro";
   capture date and the specs already referencing it. Running `design write` over
   an authored design is refused rather than silently stripping that record.
 
+  Remove one from a declared source. A document nothing references is removed
+  outright, and removing one that is already gone reports success rather than an
+  error, so a tidy-up that retries is safe:
+
+  ```bash
+  spektacular design delete --data '{"source":"api","path":"payments/v2.md"}'
+  ```
+
+  A design that a spec still references is not removed. The refusal names every
+  spec that references it and gives you the step to clear each one, and neither
+  the document nor any spec is changed by the attempt, so a spec can never be
+  left pointing at a design that is not there.
+
+  Removing a design and removing a *reference* to one are different things, and
+  it is worth being clear which you want. `design ref remove` drops the pointer a
+  spec carries and deliberately leaves the document where it is. `design delete`
+  removes the document, and refuses while any pointer remains. Clearing the
+  references first, then deleting, is the order the refusal walks you through.
+  Anyone looking for a way to delete a design meets the reference command first,
+  and it appears to succeed while the document is still sitting there.
+
   Record a reference on a spec, or remove one. A reference naming a source the
   project has not declared is refused, and nothing is recorded:
 
@@ -381,6 +402,24 @@ import Button from "../components/Button.astro";
     "next_action": "run 'design list --source api' to see what that source holds, or write the document with 'design write'"
   }
   ```
+
+  Removing a design that is still referenced is the other refusal worth knowing,
+  and it reads the same way. It names the resolved location, every spec that
+  references the document, and a runnable step to clear each one before retrying:
+
+  ```json
+  {
+    "error": true,
+    "code": "design_referenced_delete",
+    "message": "/work/design/api/payments/v2.md is still referenced by the specs \"000054_example\" and \"000055_example\", and removing it would leave those specs pointing at a document that is not there; nothing has been changed",
+    "resource": "/work/design/api/payments/v2.md",
+    "next_action": "clear each reference first, then retry the delete: design ref remove --data '{\"spec\":\"000054_example\",\"source\":\"api\",\"path\":\"payments/v2.md\"}'; design ref remove --data '{\"spec\":\"000055_example\",\"source\":\"api\",\"path\":\"payments/v2.md\"}', then design delete --data '{\"source\":\"api\",\"path\":\"payments/v2.md\"}'"
+  }
+  ```
+
+  A design the project already had, rather than one Spektacular authored, carries
+  no record of referencing specs, so there is nothing to find and it is removed
+  like any other document.
 
   Recording or removing a reference is a change to two documents, the spec and
   the design, and they are made to fail as a unit. If the design's own record

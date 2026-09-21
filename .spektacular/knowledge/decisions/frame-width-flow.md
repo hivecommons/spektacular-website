@@ -1,3 +1,7 @@
+---
+tags: [layout, typography, width, styling, prose]
+---
+
 # Why body text is not capped at a reading measure
 
 The site runs body text the full width of the 1100px frame instead of capping it
