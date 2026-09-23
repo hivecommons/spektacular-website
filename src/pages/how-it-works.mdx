@@ -108,6 +108,87 @@ import Button from "../components/Button.astro";
 
 </QuickStart>
 
+<Section heading="Core concepts" surface>
+
+  <Fragment slot="sub">
+
+    Four words do most of the work in this documentation. They nest, and the
+    nesting is the whole model.
+
+  </Fragment>
+
+  A **workflow** is the full journey of one feature, from an idea to merged
+  code. It runs in three **stages** — Spec, Plan, Implement — and each stage
+  is broken into **steps**, driven by a state machine.
+
+  ```
+  Workflow
+  ├── Stage: Spec
+  │   └── Steps: overview → requirements → acceptance_criteria → ...
+  ├── Stage: Plan
+  │   └── Steps: discovery → architecture → milestones → phases → ...
+  └── Stage: Implement
+      └── Steps: read_plan → implement → test → verify → ...
+  ```
+
+  A **stage** is one of Spec, Plan, or Implement. Each produces an artifact
+  the next one consumes: the spec says what to build, the plan says how, and
+  implement carries it out and records what happened. A stage is entered with
+  `spektacular <stage> new` and runs to completion before the next begins.
+
+  A **step** is a single unit of work within a stage — one question to answer,
+  one section to draft, one file to write. Steps are not suggestions the agent
+  may reorder or skip: the state machine decides which step is current, what
+  it needs, and when the stage may advance. Run `spektacular plan steps` to
+  list the steps of a stage, or `spektacular plan status` to see where a
+  running one has got to.
+
+  A **phase** is a smaller thing, one level further down, and lives only
+  inside a plan. When the Plan stage reaches its `phases` step it breaks the
+  work into `Phase 1.1`, `Phase 1.2` and so on, each with its own acceptance
+  criteria. The Implement stage then walks those phases in order. So a *stage*
+  is one third of a workflow, while a *phase* is one chunk of implementation
+  work described by a plan — they are not the same unit, and the docs keep
+  them distinct.
+
+</Section>
+
+<Section heading="Why a state machine">
+
+  <Fragment slot="sub">
+
+    Spektacular implements StateFlow, which separates driving the process from
+    doing the work.
+
+  </Fragment>
+
+  The steps within a stage are not a prompt asking an agent to remember a
+  checklist. They are a state machine, following the approach set out in
+  [StateFlow: Enhancing LLM Task-Solving through State-Driven
+  Workflows](https://arxiv.org/abs/2403.11322) (Wu, Yue, Zhang, Wang and Wu,
+  arXiv:2403.11322).
+
+  StateFlow's central claim is that a complex task goes better when you
+  separate **process grounding** from **sub-task solving**. A state represents
+  the status of a running process; entering it triggers actions, such as
+  prompting a model or calling a tool; and transitions out of it are governed
+  by explicit rules rather than by the model's own sense of having finished.
+
+  Spektacular maps onto that directly. The state machine owns the process: it
+  knows the current step, what that step requires, and what must be true
+  before the stage advances. The agent owns the work inside a step, and only
+  that. This is why progress survives a context window ending, a crashed
+  session, or a switch between agents — the state lives in `state.json` rather
+  than in a conversation, so `spektacular <stage> status` can always answer
+  where things stand.
+
+  The paper reports the practical effect of this split: on InterCode SQL, a
+  13% higher success rate at a fifth of the cost compared with a ReAct-style
+  baseline, and on ALFWorld, 28% higher at a third of the cost. Constraining
+  *when* a model acts turns out to matter as much as prompting *how*.
+
+</Section>
+
 <SpecFormat heading="The spec format">
 
   <Fragment slot="sub">

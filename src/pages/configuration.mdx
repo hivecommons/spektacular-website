@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Shell.astro
 title: "Configuration - Spektacular"
-description: "Configure Spektacular via .spektacular/config.yaml and a member repository's own .spektacular/repo.yaml: command, agent, debug, spec, plan, knowledge, each repository's location, and where its code lives (source)."
+description: "Configure Spektacular via .spektacular/config.yaml and a member repository's own .spektacular/repo.yaml: command, agent, auto_commit, debug, spec, plan, knowledge, each repository's location, and where its code lives (source)."
 ---
 import Hero from "../components/sections/Hero.astro";
 import Section from "../components/sections/Section.astro";
@@ -38,6 +38,7 @@ import Button from "../components/Button.astro";
   command: spektacular
   agent: claude
   spec_trigger_threshold: moderate
+  auto_commit: "off"              # off | workflow | full
 
   debug:
     enabled: false
@@ -84,10 +85,10 @@ import Button from "../components/Button.astro";
 
   <Fragment slot="sub">
 
-    Thirteen top-level keys control the tool from `.spektacular/config.yaml`:
+    Fourteen top-level keys control the tool from `.spektacular/config.yaml`:
     `schema`, `written_by`, `skills_version`, `command`, `agent`,
-    `spec_trigger_threshold`, `debug`, `spec`, `plan`, `changelog`,
-    `knowledge`, `design`, and `repos`.
+    `spec_trigger_threshold`, `auto_commit`, `debug`, `spec`, `plan`,
+    `changelog`, `knowledge`, `design`, and `repos`.
 
   </Fragment>
 
@@ -141,6 +142,20 @@ import Button from "../components/Button.astro";
     than one requirement), or `lenient` (offers readily, including small
     fixes). Read live at the moment the agent decides whether to offer, so a
     change here takes effect immediately, mid-conversation.
+
+  </ConfigKey>
+
+  <ConfigKey name="auto_commit" type="string" defaultValue="<code>off</code>">
+
+    Whether Spektacular records the agent's work in git for you. One of
+    `off` (default: no automatic commits), `workflow` (one commit in each
+    changed repository when a spec, plan or implementation completes), or
+    `full` (as `workflow`, plus a commit after each milestone of an
+    implementation). Commits use your own `git`, run your hooks, use your
+    identity and signing settings, and are never pushed. When it is on and a
+    registered repository has uncommitted changes as a workflow starts, the
+    agent asks whether to commit them first. A repository that isn't a git
+    repository is skipped.
 
   </ConfigKey>
 
