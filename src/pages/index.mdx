@@ -7,6 +7,7 @@ import Hero from "../components/sections/Hero.astro";
 import Pipeline from "../components/sections/Pipeline.astro";
 import FeaturesGrid from "../components/sections/FeaturesGrid.astro";
 import CtaBanner from "../components/sections/CtaBanner.astro";
+import Section from "../components/sections/Section.astro";
 import Badge from "../components/Badge.astro";
 import Button from "../components/Button.astro";
 import InstallBlock from "../components/InstallBlock.astro";
@@ -83,6 +84,32 @@ import PipelineConnector from "../components/PipelineConnector.astro";
     welcome.
   </FeatureCard>
 </FeaturesGrid>
+
+<Section heading="Part of Hive Commons" surface>
+
+  <Fragment slot="sub">
+
+    Spektacular is developed under [Hive
+    Commons](https://github.com/hivecommons), the umbrella community for Hive —
+    AI-agent fleet orchestration with governed, audited agent swarms.
+
+  </Fragment>
+
+  Spektacular handles one feature at a time: a spec, a plan, and an
+  implementation you can review. Hive Commons is where that work is scaled up —
+  Hive itself orchestrates fleets of coding agents across repositories, with the
+  governance and audit trail that running agents at that scale demands.
+
+  The two fit together deliberately. A Spektacular workflow is the unit of work
+  a fleet orchestrator schedules, and its artifacts — the spec, the plan, the
+  changelog record — are the audit trail that makes an agent's output
+  reviewable rather than merely plausible.
+
+  Alongside them the community maintains related tooling for agent-assisted
+  development, including `hotshot`, `pluk`, `promptargs`, `rationguard` and
+  `dibs`.
+
+</Section>
 
 <CtaBanner
   heading="Ready to build smarter?"

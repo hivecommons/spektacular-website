@@ -2,19 +2,31 @@
 const githubURL = "https://github.com/jumppad-labs/spektacular";
 const releasesURL = "https://github.com/jumppad-labs/spektacular/releases";
 const licenseURL = "https://github.com/jumppad-labs/spektacular/blob/main/LICENSE";
+const hiveCommonsURL = "https://github.com/hivecommons";
 ---
 <footer class="bg-bg-surface border-t border-border-subtle py-7 mt-auto">
   <div class="mx-auto max-w-[1100px] px-md">
     <div class="flex items-center justify-between flex-wrap gap-4 max-sm:flex-col max-sm:items-start">
-      <span class="text-sm text-text-muted">
-        Spektacular —
-        <a
-          href={licenseURL}
-          class="text-text-secondary hover:text-text-primary no-underline"
-          target="_blank"
-          rel="noopener"
-        >Apache 2.0</a>
-      </span>
+      <div class="flex flex-col gap-1">
+        <span class="text-sm text-text-muted">
+          Spektacular —
+          <a
+            href={licenseURL}
+            class="text-text-secondary hover:text-text-primary no-underline"
+            target="_blank"
+            rel="noopener"
+          >Apache 2.0</a>
+        </span>
+        <span class="text-sm text-text-muted">
+          Part of
+          <a
+            href={hiveCommonsURL}
+            class="text-text-secondary hover:text-text-primary no-underline"
+            target="_blank"
+            rel="noopener"
+          >Hive Commons</a>
+        </span>
+      </div>
       <div class="flex gap-6">
         <a
           href={githubURL}
@@ -22,6 +34,12 @@ const licenseURL = "https://github.com/jumppad-labs/spektacular/blob/main/LICENS
           target="_blank"
           rel="noopener"
         >GitHub</a>
+        <a
+          href={hiveCommonsURL}
+          class="text-sm text-text-secondary hover:text-text-primary no-underline"
+          target="_blank"
+          rel="noopener"
+        >Hive Commons</a>
         <a
           href={releasesURL}
           class="text-sm text-text-secondary hover:text-text-primary no-underline"
