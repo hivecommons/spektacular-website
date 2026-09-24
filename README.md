@@ -1,6 +1,6 @@
 # spektacular-website
 
-The marketing site for [Spektacular](https://github.com/jumppad-labs/spektacular),
+The marketing site for [Spektacular](https://github.com/hivecommons/spektacular),
 built with [Astro 5](https://astro.build/) (MDX) and
 [Tailwind CSS v4](https://tailwindcss.com/).
 
