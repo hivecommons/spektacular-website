@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Shell.astro
 title: "Design Documents - Spektacular"
-description: "What a design document is, when to reach for one instead of putting the detail in a spec, and how Spektacular resolves, reads and references them."
+description: "What a design document is, when to reach for one instead of putting the detail in a spek, and how Spektacular resolves, reads and references them."
 ---
 import Hero from "../components/sections/Hero.astro";
 import Section from "../components/sections/Section.astro";
@@ -11,7 +11,7 @@ import Button from "../components/Button.astro";
 
 <Hero
   heading="Design Documents"
-  sub="The worked design a feature is built to, kept where your team already keeps it, and bound to the spec that needs it."
+  sub="The worked design a feature is built to, kept where your team already keeps it, and bound to the spek that needs it."
 />
 
 <Section heading="What a design document is">
@@ -19,10 +19,10 @@ import Button from "../components/Button.astro";
   <Prose nested>
 
   A design document holds the settled shape of something: an API, a user-facing
-  flow, a data format, or a worked example of one. It is the detail a spec needs
+  flow, a data format, or a worked example of one. It is the detail a spek needs
   to be built correctly but cannot carry without becoming unreadable.
 
-  Spektacular owns the **reference**, not the document. It resolves a declared
+  Spektacular (Spek) owns the **reference**, not the document. It resolves a declared
   source to a folder, reads and writes bytes there, and reports a reference it
   cannot resolve. It never imposes a structure on a design document's content,
   whoever wrote it.
@@ -31,19 +31,19 @@ import Button from "../components/Button.astro";
   differently. A design your team already had is never changed. It gains no
   frontmatter, is never reformatted, and comes back byte for byte as you
   supplied it, so a folder of designs you already keep is read exactly as it
-  stands. A design Spektacular authors with you is different: it carries the
-  same lifecycle record every spec and plan carries, so you can see where it
-  stands, which spec's conversation produced it, and which specs depend on it.
+  stands. A design Spek authors with you is different: it carries the
+  same lifecycle record every spek and plan carries, so you can see where it
+  stands, which spek's conversation produced it, and which speks depend on it.
 
   That is why design documents are declared rather than filed. You point
-  Spektacular at wherever your designs already live, give each place a name, and
+  Spek at wherever your designs already live, give each place a name, and
   reach the documents there by that name. Nothing moves.
 
   </Prose>
 
 </Section>
 
-<Section heading="When to use one instead of a spec section" surface>
+<Section heading="When to use one instead of a spek section" surface>
 
   <Fragment slot="sub">
 
@@ -59,16 +59,16 @@ import Button from "../components/Button.astro";
   - **Is it worked?** A concrete shape, format or flow, rather than a direction.
     "Use an embedded datastore" is direction. A field-by-field request and
     response body is worked.
-  - **Would it make the spec unreadable inline?** If a one-line steer captures
-    it, that steer belongs in the spec and there is no design document to write.
+  - **Would it make the spek unreadable inline?** If a one-line steer captures
+    it, that steer belongs in the spek and there is no design document to write.
 
   Where the detail lands if a test fails is not arbitrary:
 
   - A hard boundary the solution must honour is a **constraint**, and stays in
     the spec.
   - A preference the planner may adapt is **technical direction**, and stays in
-    the spec as a one-line steer.
-  - A worked design that would swamp the spec is a **design document**, and the
+    the spek as a one-line steer.
+  - A worked design that would swamp the spek is a **design document**, and the
     spec points at it.
 
   The discipline once you split is to summarise and link, never to restate. A
@@ -79,7 +79,7 @@ import Button from "../components/Button.astro";
 
 </Section>
 
-<Section heading="Working a design out with Spektacular">
+<Section heading="Working a design out with Spek">
 
   <Fragment slot="sub">
 
@@ -91,7 +91,7 @@ import Button from "../components/Button.astro";
   <Prose nested>
 
   Not every design arrives finished. Where the shape of something has been
-  settled in conversation but never written down, Spektacular can help you work
+  settled in conversation but never written down, Spek can help you work
   it out and then write the document from it. That is a guided interview: it
   states what it is trying to learn, asks questions that follow from your
   answers rather than working through a fixed list, and stops.
@@ -119,7 +119,7 @@ import Button from "../components/Button.astro";
   ```
 
   Nothing is written without your explicit agreement, and declining leaves no
-  file behind. A design can be authored before any spec exists; the reference
+  file behind. A design can be authored before any spek exists; the reference
   is recorded later, if a spec ever needs one.
 
   </Prose>
@@ -137,17 +137,17 @@ import Button from "../components/Button.astro";
 
   <Prose nested>
 
-  A design Spektacular authors carries the same frontmatter block every spec
+  A design Spek authors carries the same frontmatter block every spek
   and plan carries:
 
   - **Capture date**: when the design was written. Stamped once, on the first
     write, and preserved through every later revision.
   - **Document status**: where it stands, one of `draft`, `final`,
-    `superseded` or `archived`. The same four values every other Spektacular
+    `superseded` or `archived`. The same four values every other Spek
     document uses.
-  - **Originating spec**: the spec whose conversation produced it, when there
-    was one. A design authored outside a spec simply does not carry this.
-  - **Referencing specs**: every spec that references it, kept in step
+  - **Originating spek**: the spec whose conversation produced it, when there
+    was one. A design authored outside a spek simply does not carry this.
+  - **Referencing speks**: every spek that references it, kept in step
     automatically as references are added and removed.
 
   ```yaml
@@ -161,7 +161,7 @@ import Button from "../components/Button.astro";
   ```
 
   A design your team already had carries no such block at all. That is the
-  difference between the two kinds, and it is also how Spektacular tells them
+  difference between the two kinds, and it is also how Spek tells them
   apart: the document itself is the record, so there is nothing else to keep in
   step with it. Listing a source shows both side by side, an authored design
   reporting its status and provenance, one of yours reporting nothing but where
@@ -171,7 +171,7 @@ import Button from "../components/Button.astro";
 
 </Section>
 
-<Section heading="How they relate to specs and plans">
+<Section heading="How they relate to speks and plans">
 
   <Fragment slot="sub">
 
@@ -182,11 +182,11 @@ import Button from "../components/Button.astro";
 
   <Prose nested>
 
-  **A spec records references.** Each one names both the source it belongs to
+  **A spek records references.** Each one names both the source it belongs to
   and the document within that source, so it can always be resolved back to a
-  real place. References live in the spec's own record rather than its prose,
+  real place. References live in the spek's own record rather than its prose,
   which is what makes them validated when written and durable afterwards: they
-  survive the spec being rewritten.
+  survive the spek being rewritten.
 
   **A plan resolves and reads every one before designing.** The plan workflow is
   obliged to read each referenced design in full, to build on it rather than
@@ -197,9 +197,9 @@ import Button from "../components/Button.astro";
   shipped design to match the implementation, and no command rewrites one to
   make it match. It records what was agreed.
 
-  A design document holds no back-links, so any number of specs may reference
+  A design document holds no back-links, so any number of speks may reference
   the same design and it outlives the feature that introduced it. Here is how a
-  spec carries its references:
+  spek carries its references:
 
   ```yaml
   ---
@@ -261,7 +261,7 @@ import Button from "../components/Button.astro";
   <Fragment slot="sub">
 
     Agents reach design documents through the CLI rather than by reading files
-    directly, as they already do for specs, plans and changelog records.
+    directly, as they already do for speks, plans and changelog records.
 
   </Fragment>
 
@@ -295,8 +295,8 @@ import Button from "../components/Button.astro";
   spektacular design write --data '{"source":"api","path":"payments/v2.md"}' --from ./draft.md
   ```
 
-  Write one that Spektacular authored with you, stamping its lifecycle record.
-  Name the spec the conversation belonged to, and set a status, if either
+  Write one that Spek authored with you, stamping its lifecycle record.
+  Name the spek the conversation belonged to, and set a status, if either
   applies:
 
   ```bash
@@ -305,9 +305,9 @@ import Button from "../components/Button.astro";
   ```
 
   Use `design write` for a document you wrote and are handing over, and
-  `design author` for one Spektacular wrote with you. Re-running `design author`
+  `design author` for one Spek wrote with you. Re-running `design author`
   on an existing authored design updates it in place, keeping its original
-  capture date and the specs already referencing it. Running `design write` over
+  capture date and the speks already referencing it. Running `design write` over
   an authored design is refused rather than silently stripping that record.
 
   Remove one from a declared source. A document nothing references is removed
@@ -318,20 +318,20 @@ import Button from "../components/Button.astro";
   spektacular design delete --data '{"source":"api","path":"payments/v2.md"}'
   ```
 
-  A design that a spec still references is not removed. The refusal names every
-  spec that references it and gives you the step to clear each one, and neither
-  the document nor any spec is changed by the attempt, so a spec can never be
+  A design that a spek still references is not removed. The refusal names every
+  spek that references it and gives you the step to clear each one, and neither
+  the document nor any spek is changed by the attempt, so a spek can never be
   left pointing at a design that is not there.
 
   Removing a design and removing a *reference* to one are different things, and
   it is worth being clear which you want. `design ref remove` drops the pointer a
-  spec carries and deliberately leaves the document where it is. `design delete`
+  spek carries and deliberately leaves the document where it is. `design delete`
   removes the document, and refuses while any pointer remains. Clearing the
   references first, then deleting, is the order the refusal walks you through.
   Anyone looking for a way to delete a design meets the reference command first,
   and it appears to succeed while the document is still sitting there.
 
-  Record a reference on a spec, or remove one. A reference naming a source the
+  Record a reference on a spek, or remove one. A reference naming a source the
   project has not declared is refused, and nothing is recorded:
 
   ```bash
@@ -339,7 +339,7 @@ import Button from "../components/Button.astro";
   spektacular design ref remove --data '{"spec":"000054_example","source":"api","path":"payments/v2.md"}'
   ```
 
-  Ask what a spec references, and whether each reference resolves:
+  Ask what a spek references, and whether each reference resolves:
 
   ```bash
   spektacular design ref list --data '{"spec":"000054_example"}'
@@ -384,7 +384,7 @@ import Button from "../components/Button.astro";
   <Prose nested>
 
   The two commands divide the work deliberately. `design ref list` always
-  succeeds, so a single call shows every reference a spec carries at once, with
+  succeeds, so a single call shows every reference a spek carries at once, with
   the absolute location searched for each and a count of those that did not
   resolve. That is the complete picture the plan workflow needs, and the plan
   workflow stops and reports rather than planning around a gap.
@@ -404,7 +404,7 @@ import Button from "../components/Button.astro";
   ```
 
   Removing a design that is still referenced is the other refusal worth knowing,
-  and it reads the same way. It names the resolved location, every spec that
+  and it reads the same way. It names the resolved location, every spek that
   references the document, and a runnable step to clear each one before retrying:
 
   ```json
@@ -417,15 +417,15 @@ import Button from "../components/Button.astro";
   }
   ```
 
-  A design the project already had, rather than one Spektacular authored, carries
-  no record of referencing specs, so there is nothing to find and it is removed
+  A design the project already had, rather than one Spek authored, carries
+  no record of referencing speks, so there is nothing to find and it is removed
   like any other document.
 
-  Recording or removing a reference is a change to two documents, the spec and
+  Recording or removing a reference is a change to two documents, the spek and
   the design, and they are made to fail as a unit. If the design's own record
   cannot be updated, the whole operation is refused and the spec is put back
-  exactly as it was, so a spec and a design are never left contradicting each
-  other. In the rare case that restoring the spec also fails, that is reported
+  exactly as it was, so a spek and a design are never left contradicting each
+  other. In the rare case that restoring the spek also fails, that is reported
   as its own distinct outcome, naming both files to reconcile by hand, because
   the corrective action is different from a simple retry.
 
@@ -443,9 +443,9 @@ import Button from "../components/Button.astro";
 
   <Prose nested>
 
-  **The spec stays readable because the design is referenced, not absorbed.**
-  The complaint that motivated design documents was specs that became unusable
-  once a worked API shape was pasted into them. A reference keeps the spec at
+  **The spek stays readable because the design is referenced, not absorbed.**
+  The complaint that motivated design documents was speks that became unusable
+  once a worked API shape was pasted into them. A reference keeps the spek at
   the altitude it reads best at while still binding the work to the design that
   was agreed.
 
@@ -457,7 +457,7 @@ import Button from "../components/Button.astro";
 
   **Storage is declared, not imposed.** Teams already keep designs somewhere: a
   folder in the repo, a shared directory, a sibling checkout. Requiring them to
-  move into a Spektacular-owned directory would be the one thing guaranteed to
+  move into a Spek-owned directory would be the one thing guaranteed to
   stop them adopting design documents at all. So you name the places, and
   nothing moves.
 

@@ -12,29 +12,29 @@ import Button from "../components/Button.astro";
 
 <Hero
   heading="Multi-Repo Projects"
-  sub="A Spektacular project can span more than one repository, tracked together as one coherent unit of work."
+  sub="A Spektacular (Spek) project can span more than one repository, tracked together as one coherent unit of work."
 />
 
 <Section heading="What a multi-repo project is">
 
   <Fragment slot="sub">
 
-    Spektacular projects are designed to work the way that you work. For example
+    Spek projects are designed to work the way that you work. For example
     some teams may choose to keep spektacular configuration and code in a single
     repository; however, some teams may prefer to keep this configuration separate.
-    This flexibility does not tightly couple Spektacular to your projects enabling
+    This flexibility does not tightly couple Spek to your projects enabling
     a team or even team members within a team freedom of choice.
 
   </Fragment>
-    
-  A project can register any number of other repositories too, such as a 
-  application repo alongside its documentation repo, so that planning and 
-  implementation work can address both together instead of treating them 
+
+  A project can register any number of other repositories too, such as a
+  application repo alongside its documentation repo, so that planning and
+  implementation work can address both together instead of treating them
   as separate, disconnected efforts.
 
   The Spectacular project is a live instance of the capability the `config.yaml`
-  registers two repositories: the `spektacular` repository the project is 
-  colocated with, and the `spektacular-website` repository this page is built 
+  registers two repositories: the `spektacular` repository the project is
+  colocated with, and the `spektacular-website` repository this page is built
   from. The registry itself holds nothing but a name and a location for each:
 
   ```yaml
@@ -79,7 +79,7 @@ import Button from "../components/Button.astro";
       directory: changelog
   ```
 
-  The `spektacular-website` entry points at a repo.yaml located in the 
+  The `spektacular-website` entry points at a repo.yaml located in the
   `spektacular-website`:
 
   ```yaml
@@ -102,7 +102,7 @@ import Button from "../components/Button.astro";
   `spektacular repo list` reads both sides together and reports, for each
   repository, the absolute folder holding its Spektacular files, the
   absolute folder its code is in, whether that code is a checkout you
-  provided or a clone Spektacular made, and the description, role and tags
+  provided or a clone Spek made, and the description, role and tags
   the repository gives for itself.
 
 </Section>
@@ -118,7 +118,7 @@ import Button from "../components/Button.astro";
 
   </Fragment>
 
-  In a simple one repository setup, the spektacular files are located in a 
+  In a simple one repository setup, the spektacular files are located in a
   `.spektacular/` folder next to the code base. A project created by  the
   command `spektacular init <agent>` starts this way:
 
@@ -136,8 +136,8 @@ import Button from "../components/Button.astro";
   A project can also be completely independent of the code repo. The below
   instance has the spectacular config and knowledge base located in a separate
   folder completely independent of the code base.
-  This suits teams that cannot, or would rather not, commit Spektacular 
-  files into a code repository: the project folder can be committed and 
+  This suits teams that cannot, or would rather not, commit Spek
+  files into a code repository: the project folder can be committed and
   shared while the code repository receives only code changes.
 
   ```
@@ -168,7 +168,7 @@ import Button from "../components/Button.astro";
   </Fragment>
 
   Only the first question is asked cold, because the folder your code sits in
-  is the one thing that cannot be worked out by reading it. Spektacular then
+  is the one thing that cannot be worked out by reading it. Spek then
   reads what the repository says about itself, its README, whatever manifest
   its language uses, and what it is written in, and every question after that
   arrives with an answer already drafted:
@@ -201,7 +201,7 @@ import Button from "../components/Button.astro";
     5. Chat about this
 
   Agent: Which repo would you like to add? Tell me the folder its code lives in — a path on this machine.
-  
+
   You: ../jumppad
 
   Agent: Found it — a Go tool that calls itself jumppad, for building cloud native development environments. I will call it jumppad in this project. Does that work for you? If you would rather not go through the remaining details one at a time, I can read the repo and fill them in myself — just say the word and I will take it from here.
@@ -259,7 +259,7 @@ import Button from "../components/Button.astro";
   <Fragment slot="sub">
 
     A project's own `.spektacular/config.yaml` holds membership only: which
-    repositories belong to this project, and where each one's Spektacular
+    repositories belong to this project, and where each one's Spek
     files are. Everything that describes a repository itself, its
     description, role, tags, knowledge sources, changelog settings, and
     where its code lives, lives instead in that repository's own
@@ -314,7 +314,7 @@ import Button from "../components/Button.astro";
   Changelog records are written twice over. One central record lives in the
   project, covering the feature as a whole, and every repository the work
   touched gets its own derived entry in its own changelog store, carrying
-  front matter that names the project and the spec and plan it came from:
+  front matter that names the project and the spek and plan it came from:
 
   ```yaml
   ---
@@ -344,7 +344,7 @@ import Button from "../components/Button.astro";
 
   </Fragment>
 
-  Once a clone exists it is reused as-is. Spektacular never fetches or pulls
+  Once a clone exists it is reused as-is. Spek never fetches or pulls
   on your behalf. If a clone has fallen behind its remote, `repo list`
   reports a `stale_note` against that repository and leaves the decision to
   you:
@@ -365,13 +365,13 @@ import Button from "../components/Button.astro";
 
     Any repository, or the project's own storage, can carry a
     `.spektacular_ignore` file using gitignore-style patterns, to keep paths
-    such as build output or vendored code out of Spektacular's own search
+    such as build output or vendored code out of Spek's own search
     and listing results.
 
   </Fragment>
 
   The file sits at the root of the source it applies to and affects only
-  Spektacular's own search and listing. A file named directly is still
+  Spek's own search and listing. A file named directly is still
   readable even when it matches a pattern, and the agent's ordinary file
   tools are unaffected, so an ignore file is a way to keep results relevant
   rather than a way to restrict access.

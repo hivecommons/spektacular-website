@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Shell.astro
 title: "Plugins - Spektacular"
-description: "Spektacular is built around a pluggable architecture: Store backends for specs, plans, and knowledge, and Agent backends for coding agents."
+description: "Spektacular is built around a pluggable architecture: Store backends for speks, plans, and knowledge, and Agent backends for coding agents."
 ---
 import Hero from "../components/sections/Hero.astro";
 import FeaturesGrid from "../components/sections/FeaturesGrid.astro";
@@ -13,22 +13,22 @@ import Button from "../components/Button.astro";
 
 <Hero
   heading="Plugins"
-  sub="Spektacular's pluggable architecture lets specs, plans, knowledge, and agents come from wherever your team already keeps them."
+  sub="Spektacular (Spek)'s pluggable architecture lets speks, plans, knowledge, and agents come from wherever your team already keeps them."
 />
 
 <FeaturesGrid
   heading="What's pluggable"
-  sub="Two plugin points sit at the core of Spektacular. Implement either interface and register your backend to use it."
+  sub="Two plugin points sit at the core of Spek. Implement either interface and register your backend to use it."
   cols={2}
 >
   <FeatureCard icon="🗄️" title="The Store interface">
-    One interface, three use-cases: where **specs** live, where **plans** live,
+    One interface, three use-cases: where **speks** live, where **plans** live,
     and where **knowledge** is read from. Each section of `config.yaml`
     independently names a Store provider, so you can mix and match.
   </FeatureCard>
 
   <FeatureCard icon="🤖" title="The Agent interface">
-    The coding agent Spektacular drives during the implement workflow. Each
+    The coding agent Spek drives during the implement workflow. Each
     registered agent declares its name and how to install workflow artefacts
     into a target project.
   </FeatureCard>
@@ -63,7 +63,7 @@ import Button from "../components/Button.astro";
   </Plugin>
 
   <Plugin slot="planned" name="obsidian" status="planned" badgeText="Planned · Store">
-    Knowledge Store backed by an Obsidian vault. Lets teams point Spektacular
+    Knowledge Store backed by an Obsidian vault. Lets teams point Spek
     at the markdown they already curate.
   </Plugin>
 
@@ -73,7 +73,7 @@ import Button from "../components/Button.astro";
   </Plugin>
 
   <Plugin slot="planned" name="jira" status="planned" badgeText="Planned · Store">
-    Spec Store backed by Jira. Tickets become spec inputs; planned work links
+    Spec Store backed by Jira. Tickets become spek inputs; planned work links
     back to the ticket they came from.
   </Plugin>
 </PluginInventory>
