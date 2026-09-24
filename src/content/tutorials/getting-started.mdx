@@ -1,6 +1,6 @@
 ---
 title: "How to use Spektacular"
-summary: "Take a feature from a rough idea to working code using a Spektacular spec, the project knowledge base, and a plan-and-implement loop driven by your coding agent of choice."
+summary: "Take a feature from a rough idea to working code using a Spektacular spek, the project knowledge base, and a plan-and-implement loop driven by your coding agent of choice."
 order: 10
 ---
 import Step from "../../components/sections/Step.astro"; import
@@ -21,7 +21,7 @@ The common response is to iterate: prompt, review, correct, prompt again. This
 works, but it is slow, and it tends to surface the same mistakes repeatedly. The
 agent does not learn what your team already knows.
 
-In this tutorial you will see how Spektacular's Spec Driven Development workflow
+In this tutorial you will see how Spektacular (Spek)'s Spec Driven Development workflow
 improves this iterative process by taking a measured, planned approach to
 feature development.
 
@@ -30,30 +30,30 @@ datastore to an existing Go HTTP API as the example. The example itself does
 not matter much; what matters is the pattern, and the part of the pattern
 where most runs succeed or fail: providing the right context.
 
-The tutorial works with every coding agent Spektacular supports. Pick yours at
+The tutorial works with every coding agent Spek supports. Pick yours at
 the top of the page, and the agent-specific commands and screenshots will swap
 to match.
 
 
-## What is Spektacular
+## What is Spektacular (Spek)
 
-Spektacular is a CLI and a collection of skills that integrates with your coding
+Spek is a CLI and a collection of skills that integrates with your coding
 agent and drives Spec Driven Development end to end. It is agent-agnostic,
 shipping with adapters for Claude Code, Codex, and Bob, and it has a pluggable
-data layer so you can store your specs and knowledge base in whatever way works
+data layer so you can store your speks and knowledge base in whatever way works
 for you.
 
 There are three agent skills that do the real work:
 
 ```bash
 /spek-new        # scaffold a new specification
-/spek-plan       # turn a spec into a detailed implementation plan
+/spek-plan       # turn a spek into a detailed implementation plan
 /spek-implement  # drive the agent through the plan
 ```
 
 Each skill runs as a resumable state machine. You can stop in the middle of a
 run, edit a file, and pick the run back up. Nothing is hidden inside opaque
-agent state: the spec, the plan, the supporting research and context documents,
+agent state: the spek, the plan, the supporting research and context documents,
 and the project knowledge base all live on disk where you can read and edit
 them.
 
@@ -104,9 +104,9 @@ you can check your work against it at any time.
 
 </Step>
 
-<Step spaced number="2" heading="Install Spektacular">
+<Step spaced number="2" heading="Install Spektacular (Spek)">
 
-  Spektacular is a Go binary. Install it from GitHub releases, Homebrew, or your
+  Spek is a Go binary. Install it from GitHub releases, Homebrew, or your
   distribution's package manager. Pick whichever method fits your workflow from
   the [installation guide](/install/).
 
@@ -120,13 +120,13 @@ you can check your work against it at any time.
 
 <Step spaced number="3" heading="Install and configure your coding agent">
 
-  Spektacular drives an external coding agent. Install the one you picked at the
+  Spek drives an external coding agent. Install the one you picked at the
   top of the page. The rest of the tutorial assumes it is on your `PATH`.
 
   <AgentBlock for="claude">
 
     Install [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
-    and sign in once. 
+    and sign in once.
 
     ```bash
     claude --version
@@ -136,7 +136,7 @@ you can check your work against it at any time.
 
   <AgentBlock for="bob">
 
-    Install the Bob CLI from [https://bob.ibm.com/download?bob=shell](https://bob.ibm.com/download?bob=shell) 
+    Install the Bob CLI from [https://bob.ibm.com/download?bob=shell](https://bob.ibm.com/download?bob=shell)
     and run the following command to validate that everything is working.
 
     ```bash
@@ -147,9 +147,9 @@ you can check your work against it at any time.
 
   <AgentBlock for="codex">
 
-    Install the Codex CLI and complete its first-run setup. Spektacular
+    Install the Codex CLI and complete its first-run setup. Spek
     invokes `codex` non-interactively for each phase, so make sure the
-    CLI succeeds outside Spektacular before continuing.
+    CLI succeeds outside Spek before continuing.
 
     ```bash
     codex --version
@@ -161,12 +161,12 @@ you can check your work against it at any time.
 
 <Step spaced number="4" heading="Initialise your project">
 
-  Every repository you want to use Spektacular with needs to be initialised.
+  Every repository you want to use Spek with needs to be initialised.
   This installs the skills into your coding agent and configures the local
   knowledge base for the project.
 
-  Run `spektacular init` from the root of the codebase you want Spektacular to
-  operate on, passing your chosen agent's identifier so Spektacular knows which
+  Run `spektacular init` from the root of the codebase you want Spek to
+  operate on, passing your chosen agent's identifier so Spek knows which
   CLI to drive.
 
   <AgentBlock for="claude">
@@ -217,7 +217,7 @@ Let's now look a little deeper at the specification.
 
 If you have worked with Product Requirement Documents (PRDs), you will be
 familiar with the process of translating business requirements into a technical
-specification that you can turn into code. The specification in Spektacular
+specification that you can turn into code. The spek in Spek
 serves the same purpose: it is a hint to the agent about what you want to
 build.
 
@@ -226,7 +226,7 @@ build, not *how* you want to build it. The *how* is the agent's job. The Spec
 Driven Development process guides the agent to produce code that satisfies your
 requirements and fits the way your system is already built.
 
-The specification in the Spektacular workflow is a markdown file with the
+The spek in the Spek workflow is a markdown file with the
 following sections:
 * Overview
 * Requirements
@@ -234,12 +234,12 @@ following sections:
 * Constraints
 * Technical Approach
 * Success Metrics
-* Non-Goals 
+* Non-Goals
 
 The content in these sections guides the agent when it creates the technical
 plan that is later implemented. Time invested in the specification pays off,
 because the resulting plan is more likely to be correct and to contain the
-features you actually want. The spec also serves as living documentation, and it
+features you actually want. The spek also serves as living documentation, and it
 lets you collaborate with your team on the requirements before any code is
 written.
 
@@ -259,20 +259,20 @@ skill:
 
 You will be prompted to enter the name of the feature that you want to build.
 
-<AgentBlock for="claude"> 
+<AgentBlock for="claude">
   ![new spec](/images/tutorials/getting-started/new-spec-claude.png)
 </AgentBlock>
 
-<AgentBlock for="bob"> 
+<AgentBlock for="bob">
   ![new spec](/images/tutorials/getting-started/new-spec-bob.png)
 </AgentBlock>
 
 For the tutorial we are going to use `SQLite migration` as the feature name.
 
-Spektacular will automatically create the file name for the spec and allocate an
+Spek will automatically create the file name for the spek and allocate an
 ID to it. This depends on the configuration for your project. The
 configuration for the example is stored at `.spektacular/config.yaml`; the
-following shows the config for the spec section. 
+following shows the config for the spek storage section.
 
 ```yaml
 spec:
@@ -283,16 +283,16 @@ spec:
 ```
 
 When you enter the name SQLite migration into the prompt box, you will be
-prompted to run a command. The way Spektacular works is that the skill
+prompted to run a command. The way Spek works is that the skill
 prompts the agent to call the Spektacular CLI with the right arguments. This
-handles tasks like creating the spec file and enabling knowledge base
-lookups. 
+handles tasks like creating the spek file and enabling knowledge base
+lookups.
 
 ![spektacular command approval](/images/tutorials/getting-started/approval-claude.png)
 
-Once you approve, an empty spec will be created in the folder
+Once you approve, an empty spek will be created in the folder
 `.spektacular/specs`, and the agent will then start to prompt you to complete
-the sections of the spec. 
+the sections of the spek.
 
 ### Overview
 
@@ -303,9 +303,9 @@ built, what problem it solves, and who benefits. For the SQLite migration the
 overview might look like this:
 
 ```markdown
-Currently the monsters and users are stored in plain text files. We should migrate 
-this to a datastore so the system can safely handle updates from multiple threads 
-without relying on file writes. This benefits the teams operating and extending 
+Currently the monsters and users are stored in plain text files. We should migrate
+this to a datastore so the system can safely handle updates from multiple threads
+without relying on file writes. This benefits the teams operating and extending
 the service by making data updates more reliable and scalable.
 ```
 
@@ -323,7 +323,7 @@ Once you submit it, the agent will move on to the next section, which is the
 requirements.
 
 Your agent will probably ask you for permission to write to a temporary file.
-Spektacular writes all temporary content and context to disk before creating the
+Spek writes all temporary content and context to disk before creating the
 final specification or plan. This makes the workflow resumable, and it also lets
 you see and edit the working copy.
 
@@ -399,7 +399,7 @@ Again the agent has suggested some acceptance criteria based on the requirements
 and it is also prompting you to answer some questions that best help it refine
 this list. Interestingly the agent is also asking about deletion, which was not
 one of our requirements but is a common capability for an API. For this
-tutorial, let's just use the following list for the acceptance criteria. 
+tutorial, let's just use the following list for the acceptance criteria.
 
 ```markdown
 - When the service restarts, previously created monsters and users are still available.
@@ -417,9 +417,9 @@ criterion, we would make it measurable, for example: *The API should respond to
 monster read requests within 100ms, 95% of the time, under a load of 100
 concurrent users*.
 
-At no point have we defined any technical implementation details. The spec's job
+At no point have we defined any technical implementation details. The spek's job
 is to describe what the system must do, not how it does it. The moment you put a
-code snippet in a spec, you are making an implementation decision that belongs to
+code snippet in a spek, you are making an implementation decision that belongs to
 the agent.
 
 Next let's look at the constraints.
@@ -431,7 +431,7 @@ Next let's look at the constraints.
 Constraints are hard boundaries the solution must operate within, ones that
 cannot be inferred from context. The agent has done a good job of asking
 clarifying questions that lead to constraints for this feature. For example,
-asking about external infrastructure would guide the technology choice. 
+asking about external infrastructure would guide the technology choice.
 
 <AgentBlock for="claude">
 ![spec constraints](/images/tutorials/getting-started/constraint-claude.png)
@@ -512,7 +512,7 @@ Finally we have the non-goals section.
 <YouTubeVideo url="https://youtu.be/ZRVa9gml_Bg" start={447} end={501} fullscreen={true} />
 
 The non-goals section captures anything you specifically do not want to do. This
-limits the scope of the plan. 
+limits the scope of the plan.
 
 <AgentBlock for="claude">
 ![spec non-goals](/images/tutorials/getting-started/non-goals-claude.png)
@@ -525,10 +525,10 @@ limits the scope of the plan.
 The skill tells the agent to suggest non-goals for you, based on the
 current specification and the answers you have already provided. In this
 instance the non-goals are correct for our feature, so we can just use the
-suggested list. 
+suggested list.
 
 That completes the final section of the specification. The next step is for the
-agent to verify the specification before writing it to the specs directory.
+agent to verify the spek before writing it to the specs directory.
 
 ### Verification
 
@@ -539,21 +539,21 @@ is complete and meets the requirements for a good specification.
 
 It does this in two ways. First, it checks that the specification is well formed.
 Second, a subagent is launched with only the finished document (not the
-working files, context, or conversation), which forces it to judge the spec the
+working files, context, or conversation), which forces it to judge the spek the
 way a third-party reviewer would. Any feedback from the subagent is passed back
-to the main agent, which can make final adjustments before writing the spec to
+to the main agent, which can make final adjustments before writing the spek to
 disk.
 
-<AgentBlock for="claude"> 
-![finished spec](/images/tutorials/getting-started/finished-claude.png) 
+<AgentBlock for="claude">
+![finished spec](/images/tutorials/getting-started/finished-claude.png)
 </AgentBlock>
 
-<AgentBlock for="bob"> 
-![finished spec](/images/tutorials/getting-started/finished-bob.png) 
+<AgentBlock for="bob">
+![finished spec](/images/tutorials/getting-started/finished-bob.png)
 </AgentBlock>
 
 The agent will now generate your full specification and write it to the defined
-specification store (in this case `.spektacular/specs/`). You can open the file
+spek store (in this case `.spektacular/specs/`). You can open the file
 and review the final specification. It should look something like this:
 
 ```markdown
@@ -573,8 +573,8 @@ Today the monster and user records are kept in plain text files. This feature mo
 ```
 
 When reviewing the specification, you may find elements you want to change or
-add. You can either edit the spec directly, or chat with the agent and ask it to
-make the changes for you. 
+add. You can either edit the spek directly, or chat with the agent and ask it to
+make the changes for you.
 
 Before we move on to the next phase of Spec Driven Development, the plan phase,
 let's look at something essential to generating a good plan: the context.
@@ -584,10 +584,10 @@ let's look at something essential to generating a good plan: the context.
 If we think back to the manual software development process, a product owner
 creates a business requirement and hands it to a developer to implement. How the
 developer translates that requirement into code draws on two sources of
-knowledge: 
+knowledge:
 * what is in their head: their understanding of the language, the system's
 history, past architectural decisions, and conversations with colleagues
-* what is written down in documentation 
+* what is written down in documentation
 
 The most critical knowledge is usually split across both, with a significant
 amount living in the collective memory of the team.
@@ -604,7 +604,7 @@ As a developer, before you start coding, you assemble all of this information.
 It is often the difference between success and failure. So if the agent is going
 to act on your behalf, it needs the same context you do.
 
-Spektacular gives you two tiers to put that context in:
+Spek gives you two tiers to put that context in:
 * A repository's own knowledge, about that repository's code
 * The project's shared knowledge, for anything that spans repositories
 
@@ -666,9 +666,9 @@ func InitMonsters() error
 
 This is fine when dealing with data that has been loaded into memory, but when
 using an actual datastore, we should always allow the connection to be
-cancelled or the timeout to be controlled.  
+cancelled or the timeout to be controlled.
 
-What we really want is a datastore that supports context cancellation like the 
+What we really want is a datastore that supports context cancellation like the
 following:
 
 ```go
@@ -740,7 +740,7 @@ func (h *Handler) GetMonster(w http.ResponseWriter, r *http.Request)
 As you can see, this code uses both conventions: Context Cancellation and Dependency Injection. This follows Go best practice and idioms. Should
 your team have a different approach, you can of course capture that in the knowledge base, and the agent will use it instead.
 
-Let's now look at the concept of a team knowledge base and learn how Spektacular
+Let's now look at the concept of a team knowledge base and learn how Spek
 supports multiple knowledge sources.
 
 ### Knowledge that spans repositories
@@ -776,7 +776,7 @@ knowledge:
     location: knowledge
 ```
 
-When the agent searches for context, Spektacular queries every store the request
+When the agent searches for context, Spek queries every store the request
 covers and aggregates the results, tagging each one with the tier and store it
 came from. Narrow a request with `--tier` and `--filter` when you only want
 particular stores. These results are passed back to the agent, which can use
@@ -794,37 +794,37 @@ enough context for the implementation itself.
 
 As with the specification, you create a plan using the `spek-plan` skill.
 
-<AgentBlock for="claude"> 
-![plan start](/images/tutorials/getting-started/plan-claude.png) 
+<AgentBlock for="claude">
+![plan start](/images/tutorials/getting-started/plan-claude.png)
 </AgentBlock>
 
-<AgentBlock for="bob"> 
-![plan start](/images/tutorials/getting-started/plan-bob.png) 
+<AgentBlock for="bob">
+![plan start](/images/tutorials/getting-started/plan-bob.png)
 </AgentBlock>
 
 The agent will then prompt you to enter the name of the specification you
-want to generate a plan for. Select the spec you just created, and the
+want to generate a plan for. Select the spek you just created, and the
 agent will start to generate the plan using the configured context.
 
 During the planning process, the agent will ask you for clarification on any
 points it cannot infer from the specification or the context.
 
-<AgentBlock for="claude"> 
-![plan questions](/images/tutorials/getting-started/plan-question-claude.png) 
+<AgentBlock for="claude">
+![plan questions](/images/tutorials/getting-started/plan-question-claude.png)
 </AgentBlock>
 
-<AgentBlock for="bob"> 
-![plan questions](/images/tutorials/getting-started/plan-question-bob.png) 
+<AgentBlock for="bob">
+![plan questions](/images/tutorials/getting-started/plan-question-bob.png)
 </AgentBlock>
 
 You will also be asked to confirm some architectural decisions the agent has
 retrieved from the specification and the context.
 
-<AgentBlock for="claude"> 
-![plan confirm](/images/tutorials/getting-started/plan-confirm-claude.png) 
+<AgentBlock for="claude">
+![plan confirm](/images/tutorials/getting-started/plan-confirm-claude.png)
 </AgentBlock>
 
-The agent will then proceed to generate the required sections of the plan and 
+The agent will then proceed to generate the required sections of the plan and
 write three files to the plans directory:
 
 | File | Consumer | Description |
@@ -833,7 +833,7 @@ write three files to the plans directory:
 | `research.md` | Agent | Any research that the agent did to fill in gaps in the specification or to make decisions during the planning process. |
 | `plan.md` | Agent / User | The actual plan, this is the technical blueprint for the implementation. |
 
-Before proceeding to the implementation phase, you should review the plan and 
+Before proceeding to the implementation phase, you should review the plan and
 make any changes you feel are required. The plan is a working document: you can
 either edit it directly, or ask the agent to make changes for you.
 
@@ -852,12 +852,12 @@ the feature.
 
 You can start the implementation phase by running the `spek-implement` skill and selecting the plan you want to implement.
 
-<AgentBlock for="claude"> 
-![implement init](/images/tutorials/getting-started/implement-init-claude.png) 
+<AgentBlock for="claude">
+![implement init](/images/tutorials/getting-started/implement-init-claude.png)
 </AgentBlock>
 
-<AgentBlock for="bob"> 
-![implement init](/images/tutorials/getting-started/implement-init-bob.png) 
+<AgentBlock for="bob">
+![implement init](/images/tutorials/getting-started/implement-init-bob.png)
 </AgentBlock>
 
 During the implementation phase, the agent should run largely unattended. You
@@ -868,8 +868,8 @@ the changes to the codebase and approve them before moving on to the next one.
 
 Once all the milestones are complete, the agent will give you a final summary of the changes it has made.
 
-<AgentBlock for="claude"> 
-![implement init](/images/tutorials/getting-started/implement-done-claude.png) 
+<AgentBlock for="claude">
+![implement init](/images/tutorials/getting-started/implement-done-claude.png)
 </AgentBlock>
 
 The agent will attempt to create and run automated tests to verify the feature.
@@ -881,7 +881,7 @@ no manual testing was needed:
 ```markdown
 # Test Plan: 20260605141835-sqlite-migration
 
-The spec defines no success metrics, and the plan's Testing Approach confirms there are none to verify. Every acceptance criterion is covered by an automated behavioural test (see the acceptance-criteria coverage map at the top of `data/store_test.go`), and the two server-cutover phases were additionally validated end-to-end by running the built binary.
+The spek defines no success metrics, and the plan's Testing Approach confirms there are none to verify. Every acceptance criterion is covered by an automated behavioural test (see the acceptance-criteria coverage map at the top of `data/store_test.go`), and the two server-cutover phases were additionally validated end-to-end by running the built binary.
 
 All success metrics are covered by automated behavioural tests; no manual test plan is required.
 ```
