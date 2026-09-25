@@ -126,7 +126,7 @@ import Button from "../components/Button.astro";
   ├── Stage: Spec
   │   └── Steps: overview → requirements → acceptance_criteria → ...
   ├── Stage: Plan
-  │   └── Steps: discovery → architecture → milestones → phases → ...
+  │   └── Steps: discovery → architecture → milestones → tasks → ...
   └── Stage: Implement
       └── Steps: read_plan → implement → test → verify → ...
   ```
@@ -143,13 +143,15 @@ import Button from "../components/Button.astro";
   list the steps of a stage, or `spektacular plan status` to see where a
   running one has got to.
 
-  A **phase** is a smaller thing, one level further down, and lives only
-  inside a plan. When the Plan stage reaches its `phases` step it breaks the
-  work into `Phase 1.1`, `Phase 1.2` and so on, each with its own acceptance
-  criteria. The Implement stage then walks those phases in order. So a *stage*
-  is one third of a workflow, while a *phase* is one chunk of implementation
-  work described by a plan — they are not the same unit, and the docs keep
-  them distinct.
+  A **task** is one unit of work in a plan: it sits under a milestone, targets
+  one repository, and is carried out by an agent or by a person. When the Plan
+  stage reaches its `tasks` step it breaks the work into tasks, each with its
+  own id, the tasks it depends on, and its own acceptance criteria. The
+  Implement stage then carries them out, either the whole plan in one run or one
+  task at a time. So a *stage* is one third of a workflow, while a *task* is one
+  unit of work described by a plan. They are not the same unit, and the docs
+  keep them distinct. See [Plan tasks](/plan-tasks/) for the task format and
+  how to export a plan's tasks.
 
 </Section>
 
@@ -389,12 +391,13 @@ import Button from "../components/Button.astro";
       supporting research and context documents, are written to
       `.spektacular/plans/`.
 
-      Once the documents are written, the agent offers to walk through the
-      plan conversationally: the approach and reasoning, how the work
-      breaks into phases, and what was deliberately left out, before you
-      commit to it. You can interrupt with questions or changes at any
-      point; edits land directly in `plan.md`. Reading the documents
-      yourself remains just as valid; the walkthrough is optional.
+      Once the documents are written, the agent walks you through the plan
+      conversationally before you sign it off: the approach and reasoning,
+      how the work breaks into tasks (naming every task that needs a person,
+      and why), and what was deliberately left out. You can interrupt with
+      questions or changes at any point; edits land directly in `plan.md`.
+      The walkthrough is part of every plan and ends only when you confirm
+      the plan is right.
 
     </Fragment>
 
@@ -410,11 +413,11 @@ import Button from "../components/Button.astro";
 
     <Fragment slot="body">
 
-      **Implement** drives the coding agent through each phase of the plan
-      and verifies the output against your acceptance criteria, so you know
+      **Implement** drives the coding agent through each task of the plan,
+      or through one task you choose, and verifies the output against your acceptance criteria, so you know
       the implementation matches the spec.
 
-      Before it starts, Spektacular checks the plan's phases against the
+      Before it starts, Spektacular checks the plan's tasks against the
       spec's Requirements and Acceptance Criteria checklist: any gap must
       be either filled in or explicitly accepted as a descope. After
       implementation finishes, it checks the spec's checklist against what
