@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Shell.astro
 title: "Spektacular - Spec-driven development with AI"
-description: "Spektacular takes a markdown specification and uses AI coding agents to plan and implement your features. Agent-agnostic. Pluggable."
+description: "Spektacular takes a markdown spek and uses AI coding agents to plan and implement your features. Agent-agnostic. Pluggable."
 ---
 import Hero from "../components/sections/Hero.astro";
 import Pipeline from "../components/sections/Pipeline.astro";
@@ -17,8 +17,8 @@ import PipelineConnector from "../components/PipelineConnector.astro";
 
 <Hero
   variant="centered"
-  heading="Write the spec.<br />Ship the software."
-  sub="Spektacular takes a markdown specification and uses AI coding agents to plan and implement your features. Agent-agnostic. Pluggable."
+  heading="Write the spek.<br />Ship the software."
+  sub="Spektacular (Spek) takes a markdown spek and uses AI coding agents to plan and implement your features. Agent-agnostic. Pluggable."
 >
   <Badge slot="badge" text="v0.19.2" variant="green" dot />
   <InstallBlock slot="install" command="brew install hivecommons/homebrew-repo/spektacular" />
@@ -28,11 +28,11 @@ import PipelineConnector from "../components/PipelineConnector.astro";
 
 <Pipeline
   heading="From idea to code"
-  sub="Write a spec. Spektacular plans, then implements, driving the coding agent of your choice from a single markdown source of truth."
+  sub="Write a spek. Spek plans, then implements, driving the coding agent of your choice from a single markdown source of truth."
   surface
-  body="Plan turns a spec into a detailed implementation plan, exploring the codebase and asking questions as it goes. Implement drives a coding agent through the plan and validates the result against your acceptance criteria."
+  body="Plan turns a spek into a detailed implementation plan, exploring the codebase and asking questions as it goes. Implement drives a coding agent through the plan and validates the result against your acceptance criteria."
 >
-  <PipelineNode kind="file" icon="📄" label="spec.md" sub="your requirements,<br>constraints &amp; criteria" />
+  <PipelineNode kind="file" icon="📄" label="spek" sub="your requirements,<br>constraints &amp; criteria" />
   <PipelineConnector />
   <PipelineNode kind="step" name="Plan" sub="explores codebase,<br>asks questions" />
   <PipelineConnector />
@@ -48,24 +48,24 @@ import PipelineConnector from "../components/PipelineConnector.astro";
   sub="Everything you need for structured, AI-assisted planning, without locking you into a single agent, source of truth, or workflow."
 >
   <FeatureCard icon="📄" title="Spec-driven workflow">
-    Write a markdown spec. Spektacular drives plan and implement from it,
+    Write a markdown spek. Spek drives plan and implement from it,
     keeping intent reviewable at every stage.
   </FeatureCard>
 
   <FeatureCard icon="💬" title="Flipped Interaction interview">
-    Spektacular interviews you before drafting a spec, asking adaptive
-    questions instead of a fixed script, so you get a complete spec even
+    Spek interviews you before drafting a spek, asking adaptive
+    questions instead of a fixed script, so you get a complete spek even
     when you haven't fully thought the feature through yet.
   </FeatureCard>
 
   <FeatureCard icon="🧩" title="Pluggable architecture">
-    Specs, plans, and knowledge are stored behind a Store interface. The
+    Speks, plans, and knowledge are stored behind a Store interface. The
     coding agent is behind an Agent interface. Swap either out.
   </FeatureCard>
 
   <FeatureCard icon="🧠" title="Multi-store knowledge">
     Every repository brings its own knowledge store, and the project adds any
-    shared ones. Spektacular tags each result with the tier and store it came
+    shared ones. Spek tags each result with the tier and store it came
     from.
   </FeatureCard>
 
@@ -89,19 +89,19 @@ import PipelineConnector from "../components/PipelineConnector.astro";
 
   <Fragment slot="sub">
 
-    Spektacular is developed under [Hive
+    Spek is developed under [Hive
     Commons](https://github.com/hivecommons), the umbrella community for Hive —
     AI-agent fleet orchestration with governed, audited agent swarms.
 
   </Fragment>
 
-  Spektacular handles one feature at a time: a spec, a plan, and an
+  Spek handles one feature at a time: a spek, a plan, and an
   implementation you can review. Hive Commons is where that work is scaled up —
   Hive itself orchestrates fleets of coding agents across repositories, with the
   governance and audit trail that running agents at that scale demands.
 
-  The two fit together deliberately. A Spektacular workflow is the unit of work
-  a fleet orchestrator schedules, and its artifacts — the spec, the plan, the
+  The two fit together deliberately. A Spek workflow is the unit of work
+  a fleet orchestrator schedules, and its artifacts — the spek, the plan, the
   changelog record — are the audit trail that makes an agent's output
   reviewable rather than merely plausible.
 
@@ -113,7 +113,7 @@ import PipelineConnector from "../components/PipelineConnector.astro";
 
 <CtaBanner
   heading="Ready to build smarter?"
-  body="Spektacular is free and open source. Start with a spec, ship with confidence."
+  body="Spek is free and open source. Start with a spek, ship with confidence."
 >
   <Button href="/how-it-works/" label="Get Started →" variant="primary" large />
   <Button href="https://github.com/hivecommons/spektacular" label="Star on GitHub ⭐" variant="secondary" large external />

@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Shell.astro
 title: "How It Works - Spektacular"
-description: "A deep dive into Spektacular's spec-driven development pipeline, from writing your first spec to reviewing a complete implementation plan."
+description: "A deep dive into Spektacular's spec-driven development pipeline, from writing your first spek to reviewing a complete implementation plan."
 ---
 import Hero from "../components/sections/Hero.astro";
 import QuickStart from "../components/sections/QuickStart.astro";
@@ -19,8 +19,8 @@ import InstallBlock from "../components/InstallBlock.astro";
 import Button from "../components/Button.astro";
 
 <Hero
-  heading="How Spektacular Works"
-  sub="A deep dive into spec-driven development, from writing your first spec to shipping working code."
+  heading="How Spektacular (Spek) Works"
+  sub="A deep dive into spec-driven development, from writing your first spek to shipping working code."
 />
 
 <QuickStart
@@ -57,9 +57,9 @@ import Button from "../components/Button.astro";
 
   </Step>
 
-  <Step number="3" heading="Create a spec">
+  <Step number="3" heading="Create a spek">
 
-    All interaction with Spektacular is through your agent, spektacular provides
+    All interaction with Spek is through your agent, spektacular provides
     the agent skills that instruct it how to perform various capabilies like creating
     a new specification. 
 
@@ -70,7 +70,7 @@ import Button from "../components/Button.astro";
     /spek-new
     ```
 
-    Spektacular will then interview you first, adaptive questions about what
+    Spek will then interview you first, adaptive questions about what
     you're building, before guiding you through drafting and confirming each
     section of the specification.
 
@@ -132,7 +132,7 @@ import Button from "../components/Button.astro";
   ```
 
   A **stage** is one of Spec, Plan, or Implement. Each produces an artifact
-  the next one consumes: the spec says what to build, the plan says how, and
+  the next one consumes: the spek says what to build, the plan says how, and
   implement carries it out and records what happened. A stage is entered with
   `spektacular <stage> new` and runs to completion before the next begins.
 
@@ -159,7 +159,7 @@ import Button from "../components/Button.astro";
 
   <Fragment slot="sub">
 
-    Spektacular implements StateFlow, which separates driving the process from
+    Spek implements StateFlow, which separates driving the process from
     doing the work.
 
   </Fragment>
@@ -176,7 +176,7 @@ import Button from "../components/Button.astro";
   prompting a model or calling a tool; and transitions out of it are governed
   by explicit rules rather than by the model's own sense of having finished.
 
-  Spektacular maps onto that directly. The state machine owns the process: it
+  Spek maps onto that directly. The state machine owns the process: it
   knows the current step, what that step requires, and what must be true
   before the stage advances. The agent owns the work inside a step, and only
   that. This is why progress survives a context window ending, a crashed
@@ -191,11 +191,11 @@ import Button from "../components/Button.astro";
 
 </Section>
 
-<SpecFormat heading="The spec format">
+<SpecFormat heading="The spek format">
 
   <Fragment slot="sub">
 
-    Specs are plain markdown files. No special syntax, just structured sections
+    Speks are plain markdown files. No special syntax, just structured sections
     that give the planning agent what it needs. The Requirements and Constraints
     sections follow [ISO/IEC/IEEE 29148:2018](https://www.iso.org/standard/72089.html),
     the international standard for requirements engineering in systems and
@@ -302,7 +302,7 @@ import Button from "../components/Button.astro";
 <Pipeline
   multi
   heading="The pipeline"
-  sub="Three stages: write the spec, generate a plan, then implement and validate, with the agent checking its own work against the spec at each handoff."
+  sub="Three stages: write the spek, generate a plan, then implement and validate, with the agent checking its own work against the spek at each handoff."
 >
 
   <PipelineStage number="1" heading="Specification">
@@ -311,11 +311,11 @@ import Button from "../components/Button.astro";
     <PipelineConnector />
     <PipelineNode kind="step" name="New" sub="adaptive interview,<br>then drafted sections" />
     <PipelineConnector />
-    <PipelineNode kind="output" icon="📄" label="spec.md" sub="your requirements<br>in a standard format" />
+    <PipelineNode kind="output" icon="📄" label="spek" sub="your requirements<br>in a standard format" />
 
     <Fragment slot="body">
 
-      Before Spektacular drafts a single section, it interviews you. Rather
+      Before Spek drafts a single section, it interviews you. Rather
       than working through a fixed script, the agent asks open questions
       about what you're building, adapting each one to what you've already
       said, a technique called **Flipped Interaction**, drawn from
@@ -356,11 +356,11 @@ import Button from "../components/Button.astro";
       than asked from a blank prompt. Rejecting a draft opens a short
       follow-up conversation to understand why before anything changes,
       since a single correction can turn out to need more than one change.
-      The spec itself stays plain markdown, no special syntax, just
+      The spek itself stays plain markdown, no special syntax, just
       structured sections.
 
-      Specs don't only start this way: during any open-ended discussion,
-      the agent watches for the moment it produces something spec-worthy (a
+      Speks don't only start this way: during any open-ended discussion,
+      the agent watches for the moment it produces something spek-worthy (a
       scoped decision, a multi-requirement feature) and proactively offers
       to capture it, calibrated by the `spec_trigger_threshold`
       [config key](/configuration/). It always proposes before starting,
@@ -374,7 +374,7 @@ import Button from "../components/Button.astro";
 
     <PipelineInputs>
       <PipelineNode slot="top" kind="file" icon="📚" label="knowledge base" sub="conventions, gotchas,<br>decisions, architecture" />
-      <PipelineNode slot="bottom" kind="file" icon="📄" label="spec.md" sub="your requirements" />
+      <PipelineNode slot="bottom" kind="file" icon="📄" label="spek" sub="your requirements" />
     </PipelineInputs>
     <PipelineNode kind="step" name="Plan" sub="explores codebase,<br>asks questions" />
     <PipelineConnector />
@@ -382,7 +382,7 @@ import Button from "../components/Button.astro";
 
     <Fragment slot="body">
 
-      **Plan** turns the spec into a detailed implementation plan. It loads
+      **Plan** turns the spek into a detailed implementation plan. It loads
       your project [knowledge base](/knowledge-base/), explores the codebase,
       and surfaces clarifying questions before writing anything. The
       conventions, gotchas, decisions, and architecture it draws from the
@@ -413,14 +413,14 @@ import Button from "../components/Button.astro";
 
     <Fragment slot="body">
 
-      **Implement** drives the coding agent through each task of the plan,
-      or through one task you choose, and verifies the output against your acceptance criteria, so you know
-      the implementation matches the spec.
+      **Implement** drives the coding agent through each phase of the plan
+      and verifies the output against your acceptance criteria, so you know
+      the implementation matches the spek.
 
-      Before it starts, Spektacular checks the plan's tasks against the
-      spec's Requirements and Acceptance Criteria checklist: any gap must
+      Before it starts, Spek checks the plan's phases against the
+      spek's Requirements and Acceptance Criteria checklist: any gap must
       be either filled in or explicitly accepted as a descope. After
-      implementation finishes, it checks the spec's checklist against what
+      implementation finishes, it checks the spek's checklist against what
       was actually built, and writes a changelog record of what shipped,
       why, and how it differed from the plan to `.spektacular/changelog/`.
 
@@ -434,16 +434,16 @@ import Button from "../components/Button.astro";
 
   <Fragment slot="sub">
 
-    Once written, the spec and plan become a historical, archaeological
+    Once written, the spek and plan become a historical, archaeological
     record, not a live description of current behavior.
 
   </Fragment>
 
   A coding agent asked how the system works today reads the code, not the
-  spec: a spec and plan are a process document, not a product document,
+  spec: a spek and plan are a process document, not a product document,
   capturing the intent and scope at the time they were written, while the
   codebase keeps moving. Ask *why* something was built a particular way,
-  though, and the agent will still open and cite the relevant spec, plan, or
+  though, and the agent will still open and cite the relevant spek, plan, or
   changelog record to explain the original reasoning.
 
   The knowledge base is the exception. Entries there are current and binding
@@ -457,7 +457,7 @@ import Button from "../components/Button.astro";
 
   <Fragment slot="sub">
 
-    Every spec, plan, and changelog record Spektacular writes carries the
+    Every spek, plan, and changelog record Spek writes carries the
     same lifecycle metadata, tracked automatically without any extra
     configuration.
 
@@ -469,7 +469,7 @@ import Button from "../components/Button.astro";
   - **Closed date**: when the record was resolved, once it has one.
 
   This metadata is what makes the archaeology model workable at scale: as
-  specs, plans, and changelog records pile up across a project's history,
+  speks, plans, and changelog records pile up across a project's history,
   document status and dates are how you and your agent tell a still-active
   record from a closed one, or find the handful of records that matter out
   of hundreds. Every record supports filtering by this metadata from the CLI.
@@ -478,7 +478,7 @@ import Button from "../components/Button.astro";
 
 <CtaBanner
   heading="Ready to start?"
-  body="Install Spektacular and generate your first plan in minutes."
+  body="Install Spektacular (Spek) and generate your first plan in minutes."
 >
   <InstallBlock slot="install" command="brew install hivecommons/homebrew-repo/spektacular" />
   <Button href="https://github.com/hivecommons/spektacular" label="View on GitHub →" variant="secondary" external />

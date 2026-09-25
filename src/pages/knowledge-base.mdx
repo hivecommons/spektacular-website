@@ -11,7 +11,7 @@ import Button from "../components/Button.astro";
 
 <Hero
   heading="The Knowledge Base"
-  sub="Your project's collective memory, captured once and drawn on every time Spektacular plans a feature."
+  sub="Your project's collective memory, captured once and drawn on every time Spektacular (Spek) plans a feature."
 />
 
 <Section heading="What it is">
@@ -21,10 +21,10 @@ import Button from "../components/Button.astro";
   The knowledge base is the accumulated know-how a project draws on when
   planning: the rules it commits to, the shared vocabulary it speaks, how the
   system is built, the traps to avoid, what past work taught, and why decisions
-  were made. Spektacular keeps it alongside your code, under
+  were made. Spektacular (Spek) keeps it alongside your code, under
   `.spektacular/knowledge/`, so it lives and versions with the project.
 
-  It is a **planning-time input**. When you ask Spektacular to plan a feature,
+  It is a **planning-time input**. When you ask Spek to plan a feature,
   the planning agent reads the relevant knowledge and writes the parts that
   matter straight into the plan. The implement workflow then works only from the
   plan documents (it never re-reads the knowledge base), so the plan is the
@@ -33,7 +33,7 @@ import Button from "../components/Button.astro";
   This is what it solves: without a knowledge base, every plan starts from a
   blank slate. The agent rediscovers your conventions, walks into gotchas you
   already mapped, and re-derives decisions you already made. Captured once and
-  reused on every plan, the knowledge base is what lets Spektacular produce
+  reused on every plan, the knowledge base is what lets Spek produce
   plans that fit *your* project instead of generic ones. It is also why you can
   trust the output enough to build on it.
 
@@ -179,13 +179,13 @@ import Button from "../components/Button.astro";
 <Section heading="How a search is ranked" surface>
 
   <Fragment slot="sub">
-    To enable the effective retrieval of knowledge base entries, Spektacular
+    To enable the effective retrieval of knowledge base entries, Spek
     uses a search algorithm that is based on the content of the knowledge base
     entry and any tags that are associated with it.
   </Fragment>
 
   <Prose nested>
-    During the planning process the agent prompts within Spektacular
+    During the planning process the agent prompts within Spek
     instruct the agent to search the knowledge base for entries that provide 
     information to the task in hand.
 

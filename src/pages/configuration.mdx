@@ -12,7 +12,7 @@ import Button from "../components/Button.astro";
 
 <Hero
   heading="Configuration"
-  sub="Spektacular splits configuration across two files: a project's own .spektacular/config.yaml, which locates each member repository, and each member repository's .spektacular/repo.yaml, which describes it and says where its code lives."
+  sub="Spektacular (Spek) splits configuration across two files: a project's own .spektacular/config.yaml, which locates each member repository, and each member repository's .spektacular/repo.yaml, which describes it and says where its code lives."
 />
 
 <Section heading="Project configuration: config.yaml" surface={false}>
@@ -20,7 +20,7 @@ import Button from "../components/Button.astro";
   <Fragment slot="sub">
 
     A project's own settings: the coding agent it drives, where it stores
-    specs, plans, and changelog records, its shared knowledge stores, and the
+    speks, plans, and changelog records, its shared knowledge stores, and the
     repositories it registers as members. Every project has exactly one
     `.spektacular/config.yaml`, at the root of the project. The file is
     created by `spektacular init`, missing keys fall back to defaults, and
@@ -104,7 +104,7 @@ import Button from "../components/Button.astro";
 
   <ConfigKey name="written_by" type="string" defaultValue="written by Spektacular">
 
-    The Spektacular version that last saved this file. Informational only:
+    The Spek version that last saved this file. Informational only:
     it never triggers an upgrade, so a file written by a different version
     of the same format is left alone.
 
@@ -112,10 +112,10 @@ import Button from "../components/Button.astro";
 
   <ConfigKey name="skills_version" type="string" defaultValue="written by Spektacular">
 
-    The Spektacular version that last installed your agent skills. Only
+    The Spek version that last installed your agent skills. Only
     `init` and `migrate` set it, so rewriting the file for any other reason,
     registering a repository for example, leaves it untouched. When it
-    differs from the running Spektacular, commands stop until you upgrade.
+    differs from the running Spek, commands stop until you upgrade.
 
   </ConfigKey>
 
@@ -138,7 +138,7 @@ import Button from "../components/Button.astro";
   <ConfigKey name="spec_trigger_threshold" type="string" defaultValue="<code>moderate</code>">
 
     How readily the agent offers to capture an open-ended discussion as a
-    spec mid-conversation, rather than waiting for you to run `/spek-new`.
+    spek mid-conversation, rather than waiting for you to run `/spek-new`.
     One of `strict` (only substantial, multi-requirement features),
     `moderate` (default: a clear scoped decision or a feature with more
     than one requirement), or `lenient` (offers readily, including small
@@ -149,9 +149,9 @@ import Button from "../components/Button.astro";
 
   <ConfigKey name="auto_commit" type="string" defaultValue="<code>off</code>">
 
-    Whether Spektacular records the agent's work in git for you. One of
+    Whether Spek records the agent's work in git for you. One of
     `off` (default: no automatic commits), `workflow` (one commit in each
-    changed repository when a spec, plan or implementation completes), or
+    changed repository when a spek, plan or implementation completes), or
     `full` (as `workflow`, plus a commit after each milestone of an
     implementation). Commits use your own `git`, run your hooks, use your
     identity and signing settings, and are never pushed. When it is on and a
@@ -172,18 +172,18 @@ import Button from "../components/Button.astro";
 
   <ConfigKey name="spec" type="section" defaultValue="file provider, timestamp IDs, <code>specs</code>">
 
-    How specs are stored and identified.
+    How speks are stored and identified.
 
     - `spec.provider`: storage backend; only `file` ships today.
-    - `spec.id_method`: spec naming scheme. One of `timestamp` (default),
+    - `spec.id_method`: spek naming scheme. One of `timestamp` (default),
       `counter` (sequential numbers), or `external` (the caller supplies an
-      `id` with each spec).
-    - `spec.config.directory`: where the file provider writes specs. Defaults
+      `id` with each spek).
+    - `spec.config.directory`: where the file provider writes speks. Defaults
       to `specs`, relative to the folder holding `config.yaml` (the same rule as
-      `repos[].location`), so specs land in `.spektacular/specs`. A directory
+      `repos[].location`), so speks land in `.spektacular/specs`. A directory
       outside the project is refused.
 
-    Every spec record also carries lifecycle metadata: a created date, a
+    Every spek record also carries lifecycle metadata: a created date, a
     document status, and, once resolved, a closed date, tracked automatically
     without any extra configuration.
 
@@ -218,7 +218,7 @@ import Button from "../components/Button.astro";
     A record is written automatically at the end of every `implement` run,
     one flat markdown file per feature, covering what was built, why it
     matters, and how the outcome differed from the plan. Every changelog
-    record also carries the same lifecycle metadata as specs and plans: a
+    record also carries the same lifecycle metadata as speks and plans: a
     created date, a document status, and, once resolved, a closed date.
 
   </ConfigKey>
@@ -242,7 +242,7 @@ import Button from "../components/Button.astro";
   <ConfigKey name="design" type="section" defaultValue="none">
 
     Ordered list of the design sources the project declares. A design document
-    holds the worked design a feature is built to, and a spec references one
+    holds the worked design a feature is built to, and a spek references one
     rather than restating it. Design sources are declared by the project only;
     a repository does not declare its own.
 
@@ -256,8 +256,8 @@ import Button from "../components/Button.astro";
 
     A source can hold both kinds of design document side by side. A design your
     team already had is stored exactly as supplied, gaining no frontmatter and
-    never being reformatted; a design Spektacular authors with you carries the
-    same lifecycle record every spec and plan carries.
+    never being reformatted; a design Spek authors with you carries the
+    same lifecycle record every spek and plan carries.
 
     See the [Design Documents](/design-documents/) page for the full reference.
 
@@ -365,7 +365,7 @@ import Button from "../components/Button.astro";
 
   <ConfigKey name="written_by" type="string" defaultValue="written by Spektacular">
 
-    The Spektacular version that last saved this file, for diagnosis only.
+    The Spek version that last saved this file, for diagnosis only.
 
   </ConfigKey>
 
@@ -400,7 +400,7 @@ import Button from "../components/Button.astro";
     `repo list` reports it as the repository's `root` and workflows send
     agents there; knowledge and changelog entries still land where this
     file's `knowledge` and `changelog` keys say, under the folder holding
-    `repo.yaml`. Leave it unset when the repository's Spektacular files
+    `repo.yaml`. Leave it unset when the repository's Spek files
     sit inside its code. Not to be confused with the project-level
     `source` in `config.yaml`, which records a git address for changelog
     provenance only.
@@ -438,7 +438,7 @@ import Button from "../components/Button.astro";
   <Fragment slot="sub">
 
     Every settings file records the format version it was written in. When a
-    release changes that format, or when you install a newer Spektacular than
+    release changes that format, or when you install a newer Spek than
     the one that installed your agent skills, commands stop with an error
     naming `migrate` until the project is brought up to date. `migrate`,
     `init`, `version check` and `help` always run, so the way out is always
@@ -471,15 +471,15 @@ import Button from "../components/Button.astro";
 
   Re-running `spektacular init <agent>` applies the same upgrades before it
   does anything else, so an existing project can also be brought current by
-  setting it up again. A file written by a *newer* Spektacular is refused
-  rather than converted: the error asks you to update Spektacular, and the
+  setting it up again. A file written by a *newer* Spek is refused
+  rather than converted: the error asks you to update Spek, and the
   file is never rewritten.
 
 </Section>
 
 <CtaBanner
   heading="Pluggable by design"
-  body="Specs, plans, knowledge, and agents are all behind plugin interfaces. See what ships today and what's planned."
+  body="Speks, plans, knowledge, and agents are all behind plugin interfaces. See what ships today and what's planned."
 >
   <Button href="/plugins/" label="Browse plugins →" variant="primary" large />
 </CtaBanner>
