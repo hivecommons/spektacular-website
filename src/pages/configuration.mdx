@@ -187,6 +187,11 @@ import Button from "../components/Button.astro";
     document status, and, once resolved, a closed date, tracked automatically
     without any extra configuration.
 
+    Locations the CLI reports for speks, such as a list's `path`, are relative
+    to the folder holding `config.yaml`, for example `specs/<name>.md`. Speks
+    are addressed by name, never by this location: see
+    [Documents](/documents/).
+
   </ConfigKey>
 
   <ConfigKey name="plan" type="section" defaultValue="file provider, <code>plans</code>">
@@ -204,6 +209,12 @@ import Button from "../components/Button.astro";
     document status, and, once resolved, a closed date, tracked automatically
     without any extra configuration.
 
+    Locations the CLI reports for plan documents, such as a list's `path` or
+    the status `plan_path`, are relative to the folder holding `config.yaml`,
+    for example `plans/<name>/plan.md`. Plan documents are addressed by the
+    feature name and a document name, never by this location: see
+    [Documents](/documents/).
+
   </ConfigKey>
 
   <ConfigKey name="changelog" type="section" defaultValue="file provider, <code>changelog</code>">
@@ -220,6 +231,11 @@ import Button from "../components/Button.astro";
     matters, and how the outcome differed from the plan. Every changelog
     record also carries the same lifecycle metadata as speks and plans: a
     created date, a document status, and, once resolved, a closed date.
+
+    Locations the CLI reports for changelog records, such as a list's `path`,
+    are relative to the folder holding `config.yaml`, for example
+    `changelog/<name>.md`. Records are addressed by name, never by this
+    location: see [Documents](/documents/).
 
   </ConfigKey>
 

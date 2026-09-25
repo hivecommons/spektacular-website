@@ -1,0 +1,345 @@
+---
+layout: ../layouts/Shell.astro
+title: "Documents - Spektacular"
+description: "How specs, plan documents and changelog records are addressed by the feature's bare name, where the store keeps them, and how to move from the earlier file-name spellings."
+---
+import Hero from "../components/sections/Hero.astro";
+import Section from "../components/sections/Section.astro";
+import Prose from "../components/sections/Prose.astro";
+import ConfigurationKeys from "../components/sections/ConfigurationKeys.astro";
+import ConfigKey from "../components/sections/ConfigKey.astro";
+import CtaBanner from "../components/sections/CtaBanner.astro";
+import Button from "../components/Button.astro";
+
+<Hero
+  heading="Addressing specs, plans and changelogs"
+  sub="One name, the feature's, reaches every document a feature produces."
+/>
+
+<Section heading="Addressing documents: the rules" surface={false}>
+
+  <Fragment slot="sub">
+
+    Every feature gets one name when its workflow starts, such as
+    `000059_normalise-artifact-addressing`. That name, exactly as the workflow
+    records it, is how you reach its spec, its plan documents and its
+    changelog record.
+
+  </Fragment>
+
+  <Prose nested>
+
+  Four rules cover every store command:
+
+  1. **A spec or changelog record is addressed by the bare feature name.**
+     `spektacular spec file read 000059_normalise-artifact-addressing` reads
+     that feature's spec.
+  2. **A plan document is addressed by the feature name and a document name**,
+     as two separate arguments. The document is one of `plan`, `context`,
+     `research` or `test-plan`.
+  3. **A name never carries a file extension or a path.** `.md`, a `/`, or a
+     plan written as one joined path such as `<name>/plan.md` is refused with
+     `unexpected_extension`, and the error restates the command correctly
+     spelled.
+  4. **Every `name` a list prints is accepted unchanged** by `read`, `write`,
+     `delete` and `set-document-status`. Copy it straight from the list.
+
+  </Prose>
+
+</Section>
+
+<Section heading="Specs: spec file" surface={true}>
+
+  <Fragment slot="sub">
+
+    A spec is one document per feature, addressed by the feature name alone.
+
+  </Fragment>
+
+  <Prose nested>
+
+  List every spec the store holds:
+
+  ```bash
+  spektacular spec file list
+  ```
+
+  Read one, using a `name` from that list:
+
+  ```bash
+  spektacular spec file read 000059_normalise-artifact-addressing
+  ```
+
+  Write one from a staged file, then change its status without touching the
+  body:
+
+  ```bash
+  spektacular spec file write 000059_normalise-artifact-addressing --from .spektacular/tmp/spec.md
+  spektacular spec file set-document-status 000059_normalise-artifact-addressing --document-status final
+  ```
+
+  `spektacular spec file delete <name>` removes a spec by the same name.
+
+  </Prose>
+
+</Section>
+
+<Section heading="Plans: plan file" surface={false}>
+
+  <Fragment slot="sub">
+
+    A plan is a set of documents under one feature, so every plan document
+    command takes two arguments: the feature, then the document.
+
+  </Fragment>
+
+  <Prose nested>
+
+  With no argument, `plan file list` lists the features that have a plan:
+
+  ```bash
+  spektacular plan file list
+  ```
+
+  With a feature name, it lists that plan's documents by their bare names:
+
+  ```bash
+  spektacular plan file list 000059_normalise-artifact-addressing
+  ```
+
+  ```json
+  {
+    "error": false,
+    "files": [
+      {
+        "closed_date": "2026-09-25",
+        "created_date": "2026-09-25",
+        "document_status": "final",
+        "modified_at": "2026-09-25T13:23:54Z",
+        "name": "context",
+        "path": "plans/000059_normalise-artifact-addressing/context.md"
+      },
+      {
+        "closed_date": "2026-09-25",
+        "created_date": "2026-09-25",
+        "document_status": "final",
+        "modified_at": "2026-09-25T13:44:18Z",
+        "name": "plan",
+        "path": "plans/000059_normalise-artifact-addressing/plan.md"
+      },
+      {
+        "closed_date": "2026-09-25",
+        "created_date": "2026-09-25",
+        "document_status": "final",
+        "modified_at": "2026-09-25T13:23:54Z",
+        "name": "research",
+        "path": "plans/000059_normalise-artifact-addressing/research.md"
+      }
+    ]
+  }
+  ```
+
+  Read, write, delete or change the status of one document by naming both:
+
+  ```bash
+  spektacular plan file read 000059_normalise-artifact-addressing plan
+  spektacular plan file write 000059_normalise-artifact-addressing research --from .spektacular/tmp/research.md
+  spektacular plan file set-document-status 000059_normalise-artifact-addressing plan --document-status final
+  spektacular plan file delete 000059_normalise-artifact-addressing test-plan
+  ```
+
+  Naming a feature without a document is refused with `document_required`,
+  and asking for a document the plan does not hold returns `not_found`
+  pointing at `plan file list <name>`.
+
+  </Prose>
+
+</Section>
+
+<Section heading="Changelog records: changelog file" surface={true}>
+
+  <Fragment slot="sub">
+
+    A changelog record is one document per feature, addressed by the bare
+    feature name, in the project's central store or in a registered
+    repository's own store.
+
+  </Fragment>
+
+  <Prose nested>
+
+  Read a record from the project's central changelog:
+
+  ```bash
+  spektacular changelog file read 000059_normalise-artifact-addressing
+  ```
+
+  Add `--repo` to route through a registered repository's own changelog
+  store instead. The name is the same:
+
+  ```bash
+  spektacular changelog file read 000059_normalise-artifact-addressing --repo docs
+  spektacular changelog file list --repo docs
+  ```
+
+  `write` takes `--repo` in the same way, and `delete` and
+  `set-document-status` address a record by its bare name too.
+
+  The `path` a list reports differs between the two stores:
+
+  - Central store: `changelog/<name>.md`, relative to the folder holding the
+    project's `config.yaml`.
+  - With `--repo`: `changelog/<project>/<name>.md`, relative to the folder
+    holding that repository's `repo.yaml`, where `<project>` is the name of
+    the project that wrote the record.
+
+  </Prose>
+
+</Section>
+
+<Section heading="Where documents are stored: name and path" surface={false}>
+
+  <Fragment slot="sub">
+
+    Every list entry carries two separate facts: the name you address the
+    document by, and the place the store keeps it.
+
+  </Fragment>
+
+  <Prose nested>
+
+  - **`name`** is the address. It is what `read`, `write`, `delete` and
+    `set-document-status` accept.
+  - **`path`** is where the store keeps the document, relative to the folder
+    holding the config file that declares the store: `specs/<name>.md`,
+    `plans/<name>` for a plan in a feature list, `plans/<name>/plan.md` for
+    one of its documents, `changelog/<name>.md`, or
+    `changelog/<project>/<name>.md` with `--repo`.
+
+  Entries also carry `modified_at` and, where the document has them,
+  `created_date`, `document_status` and `closed_date`. A `path` is for
+  reading or reporting a location; never pass it back to a store command.
+
+  The workflow status commands follow the same split. While a plan or
+  implement workflow is active, `spektacular plan status` and
+  `spektacular implement status` report the plan's address and its
+  location, never an absolute host path:
+
+  ```json
+  {
+    "plan_name": "000059_normalise-artifact-addressing",
+    "plan_document": "plan",
+    "plan_path": "plans/000059_normalise-artifact-addressing/plan.md",
+    "current_step": "test",
+    "progress": "8/12"
+  }
+  ```
+
+  `plan_name` and `plan_document` together are exactly what
+  `plan file read` takes. The results of the workflow `new` and `goto`
+  commands report locations the same way: `spec_path` for a spec workflow,
+  and `plan_path` with `plan_document` for plan and implement workflows,
+  all relative to the folder holding `config.yaml`.
+
+  </Prose>
+
+</Section>
+
+<ConfigurationKeys heading="Error codes" surface={true}>
+
+  <Fragment slot="sub">
+
+    A refused address returns the standard JSON error envelope, and its
+    `next_action` gives the command to run instead.
+
+  </Fragment>
+
+  <ConfigKey name="unexpected_extension" type="error">
+
+    The name carried a file extension or a path separator, or a plan document
+    was written as one joined path such as `<name>/plan.md`. Nothing is read
+    or written. `next_action` restates the same command correctly spelled.
+    For `spektacular spec file read x.md`:
+
+    ```json
+    {
+      "error": true,
+      "code": "unexpected_extension",
+      "message": "\"x.md\" carries a file extension or path; spec documents are addressed by the bare feature name",
+      "resource": "x.md",
+      "next_action": "run `spektacular spec file read x`"
+    }
+    ```
+
+  </ConfigKey>
+
+  <ConfigKey name="document_required" type="error">
+
+    A plan document command named a feature but no document. `next_action`
+    reads: run `spektacular plan file list <name>` to see its documents, then
+    name one, e.g. `spektacular plan file read <name> plan`.
+
+  </ConfigKey>
+
+  <ConfigKey name="not_found" type="error">
+
+    The name is well formed but the store holds no such document.
+    `next_action` points at the matching list command, such as
+    `spektacular spec file list` or `spektacular plan file list <name>`.
+
+  </ConfigKey>
+
+</ConfigurationKeys>
+
+<Section heading="Upgrading from earlier spellings" surface={false}>
+
+  <Fragment slot="sub">
+
+    Earlier releases addressed documents by file name. This is a breaking
+    change with no deprecation window: the old spellings are refused with
+    `unexpected_extension`, whose `next_action` gives the new form.
+
+  </Fragment>
+
+  <Prose nested>
+
+  | Command | Earlier spelling | Now |
+  | --- | --- | --- |
+  | Spec read | `spec file read <name>.md` | `spec file read <name>` |
+  | Spec write | `spec file write <name>.md --from <file>` | `spec file write <name> --from <file>` |
+  | Spec delete | `spec file delete <name>.md` | `spec file delete <name>` |
+  | Spec status | `spec file set-document-status <name>.md` | `spec file set-document-status <name>` |
+  | Spec list | names such as `<name>.md` | names such as `<name>` |
+  | Plan read | `plan file read <name>/plan.md` | `plan file read <name> plan` |
+  | Plan write | `plan file write <name>/research.md --from <file>` | `plan file write <name> research --from <file>` |
+  | Plan delete | `plan file delete <name>/context.md` | `plan file delete <name> context` |
+  | Plan status | `plan file set-document-status <name>/plan.md` | `plan file set-document-status <name> plan` |
+  | Plan list | document names such as `plan.md` | `plan file list <name>` prints `plan`, `context`, `research`, `test-plan` |
+  | Changelog read | `changelog file read <name>.md` | `changelog file read <name>` |
+  | Changelog write | `changelog file write <name>.md --from <file>` | `changelog file write <name> --from <file>` |
+  | Changelog delete | `changelog file delete <name>.md` | `changelog file delete <name>` |
+  | Changelog status | `changelog file set-document-status <name>.md` | `changelog file set-document-status <name>` |
+  | Changelog list | names such as `<name>.md` | names such as `<name>` |
+
+  Two reported locations changed as well. A list's `path` and the status
+  commands' `plan_path` are now relative to the folder holding the config
+  file that declares the store, such as `plans/<name>/plan.md`, rather than
+  an absolute host path. Scripts that read either field as a full path need
+  to resolve it against that folder, or switch to the `name` for addressing.
+
+  </Prose>
+
+</Section>
+
+<CtaBanner heading="Where the stores live">
+  <Fragment slot="body">
+    The spec, plan and changelog stores, and the folder every `path` is
+    relative to, are set in the project's configuration.
+  </Fragment>
+  <Button
+    href="/configuration/"
+    label="Configuration →"
+    variant="primary"
+    large
+  />
+</CtaBanner>
