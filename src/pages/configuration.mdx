@@ -53,6 +53,8 @@ import Button from "../components/Button.astro";
     provider: file
     config:
       directory: plans
+    task_id:
+      provider: uuid              # where plan task ids come from
 
   changelog:
     provider: file
@@ -195,6 +197,8 @@ import Button from "../components/Button.astro";
     - `plan.config.directory`: where the file provider writes plans. Defaults
       to `plans`, relative to the folder holding `config.yaml`, so plans land in
       `.spektacular/plans`.
+    - `plan.task_id.provider`: where task identifiers come from; `uuid`
+      (default) issues random UUIDs. See [Plan tasks](/plan-tasks/).
 
     Every plan record also carries lifecycle metadata: a created date, a
     document status, and, once resolved, a closed date, tracked automatically

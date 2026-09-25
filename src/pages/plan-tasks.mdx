@@ -1,0 +1,413 @@
+---
+layout: ../layouts/Shell.astro
+title: "Plan Tasks - Spektacular"
+description: "How a plan breaks its work into tasks, which tasks need a person, and how to export a plan's task graph, track its progress and implement one task at a time."
+---
+import Hero from "../components/sections/Hero.astro";
+import Section from "../components/sections/Section.astro";
+import Prose from "../components/sections/Prose.astro";
+import ConfigurationKeys from "../components/sections/ConfigurationKeys.astro";
+import ConfigKey from "../components/sections/ConfigKey.astro";
+import CtaBanner from "../components/sections/CtaBanner.astro";
+import Button from "../components/Button.astro";
+
+<Hero
+  heading="Plan Tasks"
+  sub="A plan's work is a set of tasks. Each task is one unit of work, in one repository, for one kind of executor, and Spektacular can export them, report progress on them and implement them one at a time."
+/>
+
+<Section heading="The task format">
+
+  <Fragment slot="sub">
+
+    Tasks sit under a plan's milestones, in its `## Milestones & Tasks` section.
+    Every task carries four structured lines under its heading.
+
+  </Fragment>
+
+  <Prose nested>
+
+  ```markdown
+  #### - [ ] Task: Add the `plan export` command
+  **Id:** 7c1e4b0a-9d3f-4e2a-8b61-0f5d2c9a7e34
+  **Repo:** spektacular
+  **Depends on:**
+  - 0b9f6d2e-5a41-4c7b-9e08-3d1f7a6c2b95 — Add a plan task reader
+  **Execution:** agent
+
+  Two to four plain-language sentences on what the task does and why.
+
+  **Acceptance criteria**:
+  - [ ] Outcome statement
+  ```
+
+  The heading's checkbox is the task's completion: `[x]` means the task is done.
+  A task with nothing to wait for says so explicitly:
+
+  ```markdown
+  **Depends on:** none
+  ```
+
+  </Prose>
+
+</Section>
+
+<ConfigurationKeys heading="What each line means" surface={true}>
+
+  <ConfigKey name="Id" type="required">
+
+    An opaque identifier issued by Spektacular with `spektacular plan task-id`.
+    It is unique within the plan and never rewritten once written, so it stays
+    the same when tasks are reordered, added or retitled.
+
+  </ConfigKey>
+
+  <ConfigKey name="Repo" type="required">
+
+    Exactly one registered repository name. Work that spans two repositories is
+    two tasks.
+
+  </ConfigKey>
+
+  <ConfigKey name="Depends on" type="required">
+
+    Either `none`, or one `- <id> — <title>` line per task that must be finished
+    first. Only the id is read; the title is there so a reader can tell which
+    task it is. Every dependency must be a task in the same plan, and
+    dependencies may not form a cycle. There is no implied ordering: tasks that
+    can run in parallel simply do not depend on each other.
+
+  </ConfigKey>
+
+  <ConfigKey name="Execution" type="required">
+
+    `agent`, or `human — <reason>` with a non-empty reason.
+
+  </ConfigKey>
+
+  <ConfigKey name="Acceptance criteria" type="checkboxes">
+
+    `- [ ]` outcome statements, ticked by the implement workflow only when the
+    criterion passed verification.
+
+  </ConfigKey>
+
+  <Prose nested>
+
+  Saving a plan that breaks a rule is refused, naming the task: a missing line,
+  two repositories or one that is not registered, a dependency on an id that is
+  not in the plan, a cycle, a duplicate id, or an executor other than `agent` or
+  `human` with a reason. The plan stays exactly as it was before the refused
+  save.
+
+  </Prose>
+
+</ConfigurationKeys>
+
+<Section heading="When a task needs a person">
+
+  <Fragment slot="sub">
+
+    The planning agent decides each task's executor against four criteria.
+
+  </Fragment>
+
+  <Prose nested>
+
+  A task is `human` when completing it needs any of:
+
+  - secrets or access an agent will not have (production credentials, cloud
+    consoles, signing keys);
+  - action outside the repository (deploying, releasing, DNS, purchasing or
+    approving something);
+  - judgement that must be a person's (legal or licensing, design sign-off, a
+    stakeholder decision);
+  - verification only a person can do (visual or UX review, physical hardware).
+
+  Anything else is `agent`. A task that would need both is split: the person's
+  part becomes its own `human` task that depends on the agent's. When the plan
+  is walked through for sign-off, the agent names every human task and its
+  reason, so you know which work is waiting on a person.
+
+  </Prose>
+
+</Section>
+
+<Section heading="Task identifiers" surface>
+
+  <Prose nested>
+
+  Plan authors, agents and people alike, ask Spektacular for each new task's id
+  rather than inventing one:
+
+  ```console
+  $ spektacular plan task-id
+  { "id": "7c1e4b0a-9d3f-4e2a-8b61-0f5d2c9a7e34" }
+  ```
+
+  Where ids come from is a project setting, chosen like a storage backend. The
+  default, `uuid`, issues random UUIDs:
+
+  ```yaml
+  # .spektacular/config.yaml
+  plan:
+    task_id:
+      provider: uuid
+  ```
+
+  Consumers treat ids as opaque strings. Because dependencies refer to ids
+  rather than to positions in the plan, they stay correct however the plan is
+  edited.
+
+  </Prose>
+
+</Section>
+
+<Section heading="Exporting a plan">
+
+  <Fragment slot="sub">
+
+    `plan export` reads the plan when you ask, so it always reflects the plan's
+    current content. It works for draft and final plans alike.
+
+  </Fragment>
+
+  <Prose nested>
+
+  By default the export is a readable view grouped by milestone:
+
+  ```console
+  $ spektacular plan export 000058_plan-task-graph
+  000058_plan-task-graph  (final)  1/3 tasks complete
+
+  Milestone 1
+    [x] Add a plan task reader                      spektacular   agent
+        0b9f6d2e-5a41-4c7b-9e08-3d1f7a6c2b95
+    [ ] Add the `plan export` command               spektacular   agent
+        7c1e4b0a-9d3f-4e2a-8b61-0f5d2c9a7e34
+        depends on: Add a plan task reader
+
+  Milestone 2
+    [ ] Publish the release signing key             spektacular   human: needs access to the production key vault
+        e4a8c3f1-2b6d-4f90-a7c5-91d0b3e6f428
+        depends on: Add the `plan export` command
+  ```
+
+  With `--format json` it is a single document for tools such as orchestrators:
+
+  ```bash
+  spektacular plan export 000058_plan-task-graph --format json
+  ```
+
+  ```json
+  {
+    "kind": "plan",
+    "name": "000058_plan-task-graph",
+    "document_status": "final",
+    "tasks": [
+      {
+        "id": "7c1e4b0a-9d3f-4e2a-8b61-0f5d2c9a7e34",
+        "title": "Add the `plan export` command",
+        "milestone": 1,
+        "repo": { "name": "spektacular", "location": "https://github.com/hivecommons/spektacular" },
+        "depends_on": ["0b9f6d2e-5a41-4c7b-9e08-3d1f7a6c2b95"],
+        "execution": { "type": "agent", "reason": "" },
+        "completed": false
+      }
+    ]
+  }
+  ```
+
+  `pretty` and `json` are the supported formats. Any other format, a plan that
+  does not exist, or a plan with no task structure is refused with the CLI's
+  usual structured JSON error, whichever format was requested.
+
+  </Prose>
+
+</Section>
+
+<ConfigurationKeys heading="Export fields" surface={true}>
+
+  <ConfigKey name="kind" type="string">
+
+    Always `plan`.
+
+  </ConfigKey>
+
+  <ConfigKey name="name" type="string">
+
+    The plan name that was requested.
+
+  </ConfigKey>
+
+  <ConfigKey name="document_status" type="string">
+
+    The plan's lifecycle status, the same value `spektacular plan status <name>`
+    reports. Consumers decide from it whether the plan is ready to act on.
+
+  </ConfigKey>
+
+  <ConfigKey name="tasks" type="array">
+
+    Every task, in plan order.
+
+  </ConfigKey>
+
+  <ConfigKey name="tasks[].id" type="string">
+
+    The task's identifier.
+
+  </ConfigKey>
+
+  <ConfigKey name="tasks[].title" type="string">
+
+    The task's heading text.
+
+  </ConfigKey>
+
+  <ConfigKey name="tasks[].milestone" type="integer">
+
+    The number of the milestone the task sits under.
+
+  </ConfigKey>
+
+  <ConfigKey name="tasks[].repo.name" type="string">
+
+    The repository's registry name, linking back to the project's configuration.
+
+  </ConfigKey>
+
+  <ConfigKey name="tasks[].repo.location" type="string">
+
+    The repository's declared git source. Empty when none is declared; it is
+    never read from a checkout's git remotes.
+
+  </ConfigKey>
+
+  <ConfigKey name="tasks[].depends_on" type="array">
+
+    Ids of the tasks this one depends on; `[]` for `none`.
+
+  </ConfigKey>
+
+  <ConfigKey name="tasks[].execution.type" type="string">
+
+    `agent` or `human`.
+
+  </ConfigKey>
+
+  <ConfigKey name="tasks[].execution.reason" type="string">
+
+    Why a person must carry the task out; set for `human` tasks.
+
+  </ConfigKey>
+
+  <ConfigKey name="tasks[].completed" type="boolean">
+
+    Whether the task heading's checkbox is ticked.
+
+  </ConfigKey>
+
+</ConfigurationKeys>
+
+<Section heading="Tracking progress">
+
+  <Prose nested>
+
+  `spektacular plan status <name>` reports how far along a task plan is, beside
+  its usual lifecycle fields:
+
+  ```json
+  {
+    "progress": { "tasks_completed": 1, "tasks_total": 3 },
+    "tasks": [
+      {
+        "id": "0b9f6d2e-5a41-4c7b-9e08-3d1f7a6c2b95",
+        "title": "Add a plan task reader",
+        "milestone": 1,
+        "completed": true,
+        "acceptance_criteria": { "met": 2, "total": 3 }
+      }
+    ]
+  }
+  ```
+
+  Completion and acceptance criteria are separate facts. A task can be completed
+  with a criterion left unmet (an accepted deviation, for example), and the
+  status keeps that visible rather than hiding it. `plan status` answers "how
+  far along", and `plan export` answers "what is the work".
+
+  </Prose>
+
+</Section>
+
+<Section heading="Implementing one task" surface>
+
+  <Fragment slot="sub">
+
+    Name a task when starting the implement workflow and the run builds that
+    task alone.
+
+  </Fragment>
+
+  <Prose nested>
+
+  ```bash
+  spektacular implement new --data '{"name":"000058_plan-task-graph","task":"7c1e4b0a-9d3f-4e2a-8b61-0f5d2c9a7e34"}'
+  ```
+
+  Through an agent, ask for the task by name ("implement the plan export task of
+  000058_plan-task-graph") and the implement skill looks up its id and starts
+  the run.
+
+  The run still reads the whole plan, its context and research documents and
+  every design document it references, because a fact the task depends on may be
+  written only there. What it implements, tests, verifies and ticks is limited
+  to the one task. While it runs, `spektacular implement status` includes
+  `"task": "<id>"`.
+
+  Each run adds its entry to the plan's changelog. The feature-level wrap-up
+  (the test plan, the feature changelog and reconciling the spec) happens once,
+  in the run that completes the plan's last open task. Without a `task`,
+  implement works through the whole plan as it always has.
+
+  A task that cannot start is refused before anything is created, with an error
+  saying what to do instead:
+
+  - `task_not_found`: no task in the plan has that id.
+  - `task_completed`: the task's checkbox is already ticked.
+  - `task_dependencies_incomplete`: a dependency is not complete yet; the error
+    lists it.
+  - `task_requires_human`: the task's executor is `human`; the error gives the
+    reason.
+
+  </Prose>
+
+</Section>
+
+<Section heading="Plans written before tasks">
+
+  <Prose nested>
+
+  Older plans describe their work as numbered phases (`Phase 1.1`,
+  `Phase 1.2`). They are not rewritten or migrated: they still implement as a
+  whole and still make their milestone commits. Export and single-task runs
+  explain what such a plan is missing (for example, that it contains no task
+  ids) rather than refusing it for its age.
+
+  </Prose>
+
+</Section>
+
+<CtaBanner heading="See where tasks fit">
+  <Fragment slot="body">
+    Tasks are authored in the Plan stage and carried out in the Implement stage.
+    See the whole pipeline.
+  </Fragment>
+  <Button
+    href="/how-it-works/"
+    label="How it works →"
+    variant="primary"
+    large
+  />
+</CtaBanner>
