@@ -364,7 +364,20 @@ import Button from "../components/Button.astro";
   every design document it references, because a fact the task depends on may be
   written only there. What it implements, tests, verifies and ticks is limited
   to the one task. While it runs, `spektacular implement status` includes
-  `"task": "<id>"`.
+  `"task": "<id>"` beside the plan's address and location:
+
+  ```json
+  {
+    "plan_name": "000058_plan-task-graph",
+    "plan_document": "plan",
+    "plan_path": "plans/000058_plan-task-graph/plan.md",
+    "task": "7c1e4b0a-9d3f-4e2a-8b61-0f5d2c9a7e34"
+  }
+  ```
+
+  `plan_name` and `plan_document` are what `spektacular plan file read` takes,
+  and `plan_path` is the plan's location relative to the folder holding
+  `config.yaml`, never an absolute host path. See [Documents](/documents/).
 
   Each run adds its entry to the plan's changelog. The feature-level wrap-up
   (the test plan, the feature changelog and reconciling the spec) happens once,
