@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Shell.astro
 title: "Install - Spektacular"
-description: "Install Spektacular on your machine using Homebrew, Debian/Ubuntu apt, or a direct download from GitHub Releases."
+description: "Install Spektacular and its agent skills using Homebrew, Debian/Ubuntu apt, GitHub Releases, or the skills registry."
 ---
 import Hero from "../components/sections/Hero.astro";
 import InstallMethods from "../components/sections/InstallMethods.astro";
@@ -49,6 +49,33 @@ import InstallBlock from "../components/InstallBlock.astro";
     sudo apt-get update
     sudo apt-get install spektacular
     ```
+
+  </InstallMethod>
+
+  <InstallMethod heading="Agent skills registry">
+
+    [![Install Spek skills](https://skills.sh/b/hivecommons/spektacular?style=for-the-badge)](https://skills.sh/hivecommons/spektacular)
+
+    Spek's workflow skills are published from the
+    [hivecommons/spektacular](https://github.com/hivecommons/spektacular)
+    `skills/` catalog so you can install them directly into Claude Code, Bob,
+    or Codex without a Hive-managed setup. Install the Spektacular binary first,
+    then install the spec skill or the full catalog:
+
+    ```bash
+    # Install the spec skill globally for Claude Code, Bob and Codex.
+    npx skills add hivecommons/spektacular --skill spek-new -g \
+      -a claude-code -a bob -a codex -y
+
+    # Or install every Spek workflow skill.
+    npx skills add hivecommons/spektacular --skill '*' -g \
+      -a claude-code -a bob -a codex -y
+    ```
+
+    Release builds also attach a versioned `spektacular_skills_<VERSION>.tar.gz`
+    archive with the same rendered skill catalog. Each skill includes a "Use
+    with Hive" section linking standalone users to the Hive integration and the
+    [Hive Commons docs](https://docs.hivecommons.dev/).
 
   </InstallMethod>
 

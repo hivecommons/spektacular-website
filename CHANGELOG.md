@@ -1,3 +1,7 @@
+## 000057_skill-registry-publishing-docs
+
+The install page now documents installing Spektacular's workflow skills from the public skills registry catalog in `hivecommons/spektacular`, including the skills.sh install badge, one-command examples for Claude Code, Bob and Codex, and the release archive that carries the rendered skill catalog.
+
 ## 000044_projects-feature-documentation
 
 A new "Multi-Repo Projects" reference page explains how a Spektacular project can span more than one repository: why that's useful, how a repository is registered, how project and repository configuration relate to each other as one topic, how planning and implementation work is attributed across repos, how a repository becomes available locally, and how paths can be excluded from search. The page is reachable from the site's "Resources" navigation menu (listed first), and the getting-started tutorial now links to it at the point a reader following the single-repo walkthrough might otherwise assume a project can only ever contain one repository. The former separate "Repository Configuration" page has also been folded into the "Configuration" page, so project-level and per-repository configuration now read as one document instead of two.
