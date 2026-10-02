@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Shell.astro
 title: "Plan Tasks - Spektacular"
-description: "How a plan breaks its work into tasks, which tasks need a person, and how to export a plan's task graph, track its progress and implement one task at a time."
+description: "How a plan breaks its work into tasks, which tasks need a person, how to see where the work stands with the status view, and how to implement one task at a time."
 ---
 import Hero from "../components/sections/Hero.astro";
 import Section from "../components/sections/Section.astro";
@@ -13,7 +13,7 @@ import Button from "../components/Button.astro";
 
 <Hero
   heading="Plan Tasks"
-  sub="A plan's work is a set of tasks. Each task is one unit of work, in one repository, for one kind of executor, and Spektacular can export them, report progress on them and implement them one at a time."
+  sub="A plan's work is a set of tasks. Each task is one unit of work, in one repository, for one kind of executor, and Spektacular can report where they stand and implement them one at a time."
 />
 
 <Section heading="The task format">
@@ -28,7 +28,7 @@ import Button from "../components/Button.astro";
   <Prose nested>
 
   ```markdown
-  #### - [ ] Task: Add the `plan export` command
+  #### - [ ] Task: Add the epic split command
   **Id:** 7c1e4b0a-9d3f-4e2a-8b61-0f5d2c9a7e34
   **Repo:** spektacular
   **Depends on:**
@@ -163,93 +163,287 @@ import Button from "../components/Button.astro";
 
 </Section>
 
-<Section heading="Exporting a plan">
+<Section heading="Seeing where work stands: status" surface={false}>
 
   <Fragment slot="sub">
 
-    `plan export` reads the plan when you ask, so it always reflects the plan's
-    current content. It works for draft and final plans alike.
+    `spektacular status` reports a piece of work from the epic down to each
+    task. It reads the documents when you ask, so it always reflects their
+    current content, for draft and final plans alike.
 
   </Fragment>
 
   <Prose nested>
 
-  By default the export is a readable view grouped by milestone:
+  Give it an epic, a spek or a plan; you always get the whole epic. With no
+  name, it reports the workflow in progress. By default the report is a
+  readable tree:
 
   ```console
-  $ spektacular plan export 000058_plan-task-graph
-  000058_plan-task-graph  (final)  1/3 tasks complete
+  $ spektacular status 000061_epic-split
+  epic 000060_epics-and-seeded-specs  (draft)  1/3 specs implemented, 7/11 tasks
 
-  Milestone 1
-    [x] Add a plan task reader                      spektacular   agent
-        0b9f6d2e-5a41-4c7b-9e08-3d1f7a6c2b95
-    [ ] Add the `plan export` command               spektacular   agent
-        7c1e4b0a-9d3f-4e2a-8b61-0f5d2c9a7e34
-        depends on: Add a plan task reader
-
-  Milestone 2
-    [ ] Publish the release signing key             spektacular   human: needs access to the production key vault
-        e4a8c3f1-2b6d-4f90-a7c5-91d0b3e6f428
-        depends on: Add the `plan export` command
+    000060_epics-and-seeded-specs   implemented   5/5 tasks
+    000061_epic-split               in progress   2/6 tasks   ← requested
+        depends on: 000060_epics-and-seeded-specs
+        Milestone 1
+          [x] Add the split detection partial           spektacular           agent
+          [x] Add the epic split command                spektacular           agent
+              depends on: Add the split detection partial
+        Milestone 2
+          [ ] Add the split step to the spec workflow   spektacular           agent
+              depends on: Add the epic split command
+          [ ] Check dependencies at implement start     spektacular           agent
+          [ ] Document epics on the website             spektacular-website   agent
+              depends on: Add the split step to the spec workflow
+          [ ] Publish the release notes                 spektacular           human: needs access to the release account
+              depends on: Document epics on the website
+    000062_spec-seeding             specified     no plan
+        depends on: 000060_epics-and-seeded-specs
   ```
 
-  With `--format json` it is a single document for tools such as orchestrators:
+  The spek you asked about is marked `← requested` and expanded down to its
+  milestones and tasks; the other speks in the epic show one line each, with
+  their task counts (`k/N tasks`, or `no plan`) and what they depend on. A spek
+  that is not in an epic is reported on its own, without the `epic` header line.
+
+  With `--format json` the same report is a single document for tools such as
+  orchestrators. It always has the same shape, whatever you named: an `epic`
+  (`null` for a spek that is not in one) and a `specs` list (one entry for such
+  a spek), so callers never branch on what kind of name they passed.
 
   ```bash
-  spektacular plan export 000058_plan-task-graph --format json
+  spektacular status 000061_epic-split --format json
   ```
 
   ```json
   {
-    "kind": "plan",
-    "name": "000058_plan-task-graph",
-    "document_status": "final",
-    "tasks": [
+    "workflow": null,
+    "requested": "000061_epic-split",
+    "epic": {
+      "name": "000060_epics-and-seeded-specs",
+      "document_status": "draft",
+      "created_at": "2026-09-28T00:00:00Z",
+      "done": false,
+      "progress": { "specs_implemented": 1, "specs_total": 3, "tasks_completed": 7, "tasks_total": 11 },
+      "sources": []
+    },
+    "specs": [
       {
-        "id": "7c1e4b0a-9d3f-4e2a-8b61-0f5d2c9a7e34",
-        "title": "Add the `plan export` command",
-        "milestone": 1,
-        "repo": { "name": "spektacular", "location": "https://github.com/hivecommons/spektacular" },
-        "depends_on": ["0b9f6d2e-5a41-4c7b-9e08-3d1f7a6c2b95"],
-        "execution": { "type": "agent", "reason": "" },
-        "completed": false
+        "name": "000060_epics-and-seeded-specs",
+        "state": "implemented",
+        "document_status": "final",
+        "current_step": "finished",
+        "depends_on": [],
+        "ready": true,
+        "blocked_by": [],
+        "sources": [],
+        "plan": {
+          "name": "000060_epics-and-seeded-specs",
+          "document_status": "final",
+          "current_step": "finished",
+          "progress": { "tasks_completed": 5, "tasks_total": 5 },
+          "tasks": [
+            {
+              "id": "e4a8c3f1-2b6d-4f90-a7c5-91d0b3e6f428",
+              "title": "Add the epic store",
+              "milestone": 1,
+              "repo": { "name": "spektacular", "location": "https://github.com/hivecommons/spektacular" },
+              "depends_on": [],
+              "execution": { "type": "agent", "reason": "" },
+              "completed": true,
+              "acceptance_criteria": { "met": 3, "total": 3 }
+            }
+          ]
+        }
+      },
+      {
+        "name": "000061_epic-split",
+        "state": "in_progress",
+        "document_status": "final",
+        "current_step": "finished",
+        "depends_on": ["000060_epics-and-seeded-specs"],
+        "ready": true,
+        "blocked_by": [],
+        "sources": [],
+        "plan": {
+          "name": "000061_epic-split",
+          "document_status": "final",
+          "current_step": "finished",
+          "progress": { "tasks_completed": 2, "tasks_total": 6 },
+          "tasks": [
+            {
+              "id": "7c1e4b0a-9d3f-4e2a-8b61-0f5d2c9a7e34",
+              "title": "Add the epic split command",
+              "milestone": 1,
+              "repo": { "name": "spektacular", "location": "https://github.com/hivecommons/spektacular" },
+              "depends_on": ["0b9f6d2e-5a41-4c7b-9e08-3d1f7a6c2b95"],
+              "execution": { "type": "agent", "reason": "" },
+              "completed": true,
+              "acceptance_criteria": { "met": 2, "total": 3 }
+            }
+          ]
+        }
+      },
+      {
+        "name": "000062_spec-seeding",
+        "state": "specified",
+        "document_status": "final",
+        "current_step": "finished",
+        "depends_on": ["000060_epics-and-seeded-specs"],
+        "ready": true,
+        "blocked_by": [],
+        "sources": [],
+        "plan": null
       }
     ]
   }
   ```
 
-  `pretty` and `json` are the supported formats. Any other format, a plan that
-  does not exist, or a plan with no task structure is refused with the CLI's
-  usual structured JSON error, whichever format was requested.
+  The task lists are shortened here; the real report carries every task of
+  every plan.
+
+  With no name, `status` reports the workflow in progress, whichever kind it
+  is. The readable tree gains a leading line, and the JSON report fills in its
+  `workflow` block:
+
+  ```console
+  $ spektacular status
+  workflow in progress: implement 000061_epic-split, at step analyze
+
+  epic 000060_epics-and-seeded-specs  (draft)  1/3 specs implemented, 7/11 tasks
+  ...
+  ```
+
+  ```json
+  {
+    "workflow": {
+      "kind": "implement",
+      "name": "000061_epic-split",
+      "current_step": "analyze",
+      "completed_steps": ["new", "read_plan"],
+      "updated_at": "2026-09-30T10:12:00Z"
+    },
+    "requested": "000061_epic-split"
+  }
+  ```
+
+  The `epic` and `specs` that follow are the same as in the report above, left
+  out here. `status <name>` carries the same `workflow` block when the workflow in
+  progress belongs to one of the speks or plans it reports, and `null`
+  otherwise. With no name and nothing in progress, the readable form prints
+  `no workflow in progress` and the JSON report is `{"workflow": null}`.
+
+  `pretty` and `json` are the supported formats. Any other format, or a name
+  that matches no epic, spek or plan, is refused with the CLI's usual
+  structured JSON error, whichever format was requested.
 
   </Prose>
 
 </Section>
 
-<ConfigurationKeys heading="Export fields" surface={true}>
+<ConfigurationKeys heading="Status fields" surface={true}>
 
-  <ConfigKey name="kind" type="string">
+  <ConfigKey name="workflow" type="object or null">
 
-    Always `plan`.
-
-  </ConfigKey>
-
-  <ConfigKey name="name" type="string">
-
-    The plan name that was requested.
+    The workflow in progress, when it works on one of the reported speks or
+    plans: its `kind` (`spec`, `plan` or `implement`), `name`, `current_step`,
+    `completed_steps` and `updated_at`. `null` otherwise.
 
   </ConfigKey>
 
-  <ConfigKey name="document_status" type="string">
+  <ConfigKey name="requested" type="string">
 
-    The plan's lifecycle status, the same value `spektacular plan status <name>`
-    reports. Consumers decide from it whether the plan is ready to act on.
+    The name you asked about. A caller that wants only that spek picks the
+    entry in `specs` whose name, or whose plan's name, matches it.
 
   </ConfigKey>
 
-  <ConfigKey name="tasks" type="array">
+  <ConfigKey name="epic" type="object or null">
 
-    Every task, in plan order.
+    The epic's `name`, `document_status`, `created_at` and `sources`, plus a
+    roll-up that is worked out on every call and never written back:
+    `progress` counts speks implemented of the total and tasks complete of the
+    total across every plan, and `done` is true once every spek is implemented.
+    `null` for a spek that is not in an epic.
+
+  </ConfigKey>
+
+  <ConfigKey name="specs" type="array">
+
+    Every spek in the epic, in the epic's order, or the one spek when it is not
+    in an epic.
+
+  </ConfigKey>
+
+  <ConfigKey name="specs[].state" type="string">
+
+    Where the spek stands, derived from its documents and never stored. The
+    first that applies wins:
+
+    - `missing`: the epic names the spek but it cannot be read. It is reported
+      rather than failing, so one broken link does not hide the rest of the
+      epic.
+    - `stale`: the spek changed after its plan was written, under
+      `plan.strict_spec_changes`.
+    - `specified`: the spek is written and has no plan.
+    - `planned`: a plan exists with none of its tasks complete.
+    - `in_progress`: some of the plan's tasks are complete.
+    - `implemented`: every task of the plan is complete.
+
+    The readable tree shows `in_progress` as `in progress`. The implement
+    workflow's dependency check classifies speks the same way, so the two
+    never disagree.
+
+  </ConfigKey>
+
+  <ConfigKey name="specs[].document_status" type="string">
+
+    The spek's lifecycle status. Consumers decide from it whether the spek is
+    ready to act on.
+
+  </ConfigKey>
+
+  <ConfigKey name="specs[].current_step" type="string">
+
+    The live step when a spec workflow is working on this spek; otherwise
+    `finished` for a closed spek, `stale` for a stale one, and empty for one
+    still open with no workflow running.
+
+  </ConfigKey>
+
+  <ConfigKey name="specs[].depends_on" type="array">
+
+    The speks in the same epic that this one depends on; `[]` when it has none.
+
+  </ConfigKey>
+
+  <ConfigKey name="specs[].blocked_by" type="array">
+
+    The dependencies that are not yet `implemented`. `specs[].ready` is true
+    when this list is empty.
+
+  </ConfigKey>
+
+  <ConfigKey name="specs[].sources" type="array">
+
+    The material the spek was started from: its own sources, then its epic's.
+
+  </ConfigKey>
+
+  <ConfigKey name="specs[].plan" type="object or null">
+
+    The spek's plan, which shares its name: `name`, `document_status`,
+    `current_step`, and for a plan with tasks, `progress` (`tasks_completed`
+    of `tasks_total`) and `tasks`. A plan without task structure reports its
+    lifecycle with `progress` and `tasks` absent. `null` when the spek has no
+    plan.
+
+  </ConfigKey>
+
+  <ConfigKey name="specs[].plan.tasks" type="array">
+
+    Every task, in plan order. The `tasks[]` fields below describe each entry.
 
   </ConfigKey>
 
@@ -308,40 +502,18 @@ import Button from "../components/Button.astro";
 
   </ConfigKey>
 
+  <ConfigKey name="tasks[].acceptance_criteria" type="object">
+
+    How many of the task's criteria are ticked: `met` of `total`. Completion and
+    acceptance criteria are separate facts. A task can be completed with a
+    criterion left unmet (an accepted deviation, for example), and the report
+    keeps that visible rather than hiding it.
+
+  </ConfigKey>
+
 </ConfigurationKeys>
 
-<Section heading="Tracking progress">
-
-  <Prose nested>
-
-  `spektacular plan status <name>` reports how far along a task plan is, beside
-  its usual lifecycle fields:
-
-  ```json
-  {
-    "progress": { "tasks_completed": 1, "tasks_total": 3 },
-    "tasks": [
-      {
-        "id": "0b9f6d2e-5a41-4c7b-9e08-3d1f7a6c2b95",
-        "title": "Add a plan task reader",
-        "milestone": 1,
-        "completed": true,
-        "acceptance_criteria": { "met": 2, "total": 3 }
-      }
-    ]
-  }
-  ```
-
-  Completion and acceptance criteria are separate facts. A task can be completed
-  with a criterion left unmet (an accepted deviation, for example), and the
-  status keeps that visible rather than hiding it. `plan status` answers "how
-  far along", and `plan export` answers "what is the work".
-
-  </Prose>
-
-</Section>
-
-<Section heading="Implementing one task" surface>
+<Section heading="Implementing one task" surface={false}>
 
   <Fragment slot="sub">
 
@@ -353,25 +525,41 @@ import Button from "../components/Button.astro";
   <Prose nested>
 
   ```bash
-  spektacular implement new --data '{"name":"000058_plan-task-graph","task":"7c1e4b0a-9d3f-4e2a-8b61-0f5d2c9a7e34"}'
+  spektacular implement new --data '{"name":"000061_epic-split","task":"7c1e4b0a-9d3f-4e2a-8b61-0f5d2c9a7e34"}'
   ```
 
-  Through an agent, ask for the task by name ("implement the plan export task of
-  000058_plan-task-graph") and the implement skill looks up its id and starts
+  Through an agent, ask for the task by name ("implement the epic split command task
+  of 000061_epic-split") and the implement skill looks up its id and starts
   the run.
 
   The run still reads the whole plan, its context and research documents and
   every design document it references, because a fact the task depends on may be
   written only there. What it implements, tests, verifies and ticks is limited
-  to the one task. While it runs, `spektacular implement status` includes
-  `"task": "<id>"` beside the plan's address and location:
+  to the one task. While it runs, `spektacular status` reports it in the
+  `workflow` block, ahead of the same `requested`, `epic` and `specs` as any
+  other status report:
 
   ```json
   {
-    "plan_name": "000058_plan-task-graph",
+    "workflow": {
+      "kind": "implement",
+      "name": "000061_epic-split",
+      "current_step": "implement",
+      "completed_steps": ["new", "read_plan", "analyze"],
+      "updated_at": "2026-09-30T10:12:00Z"
+    },
+    "requested": "000061_epic-split"
+  }
+  ```
+
+  The implement workflow's `new` and `goto` results give the plan's address and
+  location:
+
+  ```json
+  {
+    "plan_name": "000061_epic-split",
     "plan_document": "plan",
-    "plan_path": "plans/000058_plan-task-graph/plan.md",
-    "task": "7c1e4b0a-9d3f-4e2a-8b61-0f5d2c9a7e34"
+    "plan_path": "plans/000061_epic-split/plan.md"
   }
   ```
 
@@ -398,14 +586,15 @@ import Button from "../components/Button.astro";
 
 </Section>
 
-<Section heading="Plans written before tasks">
+<Section heading="Plans written before tasks" surface={true}>
 
   <Prose nested>
 
   Older plans describe their work as numbered phases (`Phase 1.1`,
   `Phase 1.2`). They are not rewritten or migrated: they still implement as a
-  whole and still make their milestone commits. Export and single-task runs
-  explain what such a plan is missing (for example, that it contains no task
+  whole and still make their milestone commits. `status` counts their phases
+  (`k/N phases`) instead of tasks, and single-task runs explain what such a
+  plan is missing (for example, that it contains no task
   ids) rather than refusing it for its age.
 
   </Prose>

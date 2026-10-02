@@ -220,26 +220,24 @@ import Button from "../components/Button.astro";
   `created_date`, `document_status` and `closed_date`. A `path` is for
   reading or reporting a location; never pass it back to a store command.
 
-  The workflow status commands follow the same split. While a plan or
-  implement workflow is active, `spektacular plan status` and
-  `spektacular implement status` report the plan's address and its
-  location, never an absolute host path:
+  The workflow commands follow the same split. The results of the workflow
+  `new` and `goto` commands report the plan's address and its location, never
+  an absolute host path:
 
   ```json
   {
     "plan_name": "000059_normalise-artifact-addressing",
     "plan_document": "plan",
-    "plan_path": "plans/000059_normalise-artifact-addressing/plan.md",
-    "current_step": "test",
-    "progress": "8/12"
+    "plan_path": "plans/000059_normalise-artifact-addressing/plan.md"
   }
   ```
 
   `plan_name` and `plan_document` together are exactly what
-  `plan file read` takes. The results of the workflow `new` and `goto`
-  commands report locations the same way: `spec_path` for a spec workflow,
-  and `plan_path` with `plan_document` for plan and implement workflows,
-  all relative to the folder holding `config.yaml`.
+  `plan file read` takes. A spec workflow reports `spec_path` the same way,
+  and plan and implement workflows report `plan_path` with `plan_document`,
+  all relative to the folder holding `config.yaml`. To see where a workflow
+  has got to, run `spektacular status`, which addresses every spek and plan by
+  name. See [Plan tasks](/plan-tasks/) for the status view.
 
   </Prose>
 
@@ -321,11 +319,22 @@ import Button from "../components/Button.astro";
   | Changelog status | `changelog file set-document-status <name>.md` | `changelog file set-document-status <name>` |
   | Changelog list | names such as `<name>.md` | names such as `<name>` |
 
-  Two reported locations changed as well. A list's `path` and the status
-  commands' `plan_path` are now relative to the folder holding the config
+  Two reported locations changed as well. A list's `path` and the workflow
+  results' `plan_path` are now relative to the folder holding the config
   file that declares the store, such as `plans/<name>/plan.md`, rather than
   an absolute host path. Scripts that read either field as a full path need
   to resolve it against that folder, or switch to the `name` for addressing.
+
+  The per-kind status commands and `plan export` are gone too, replaced
+  outright by one top-level `status` command with no aliases. Its report
+  covers what the old commands reported, from the epic down to each task;
+  see [Plan tasks](/plan-tasks/) for its fields.
+
+  | Removed | Replaced by |
+  | --- | --- |
+  | `spec status`, `plan status`, `implement status` | `status` |
+  | `spec status <name>`, `plan status <name>` | `status <name>` |
+  | `plan export <name> [--format]` | `status <name> [--format]` |
 
   </Prose>
 

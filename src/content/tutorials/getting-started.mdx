@@ -48,7 +48,7 @@ There are three agent skills that do the real work:
 ```bash
 /spek-new        # scaffold a new specification
 /spek-plan       # turn a spek into a detailed implementation plan
-/spek-implement  # drive the agent through the plan
+/spek-implement  # implement a spek, driving the agent through its plan
 ```
 
 Each skill runs as a resumable state machine. You can stop in the middle of a
@@ -850,7 +850,7 @@ as all the requirements the agent needs have already been captured.
 In this phase, the agent reads the plan and generates the code that implements
 the feature.
 
-You can start the implementation phase by running the `spek-implement` skill and selecting the plan you want to implement.
+You can start the implementation phase by running the `spek-implement` skill and selecting the spek you want to implement. Its plan shares the spek's name, and is how the agent carries the spek out.
 
 <AgentBlock for="claude">
 ![implement init](/images/tutorials/getting-started/implement-init-claude.png)

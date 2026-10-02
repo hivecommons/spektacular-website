@@ -94,10 +94,12 @@ import Button from "../components/Button.astro";
 
   </Step>
 
-  <Step number="5" heading="Implement the plan">
+  <Step number="5" heading="Implement the spek">
 
     Finally, once the plan is complete and you are happy with it, it is time to
-    start generating code. This is also acheived by using a skill in your agents terminal.
+    implement the spek and start generating code. You implement a spek, and its
+    plan (which shares the spek's name) is how the implement workflow carries it
+    out. This is also acheived by using a skill in your agents terminal.
 
     ```bash
     /clear
@@ -140,7 +142,7 @@ import Button from "../components/Button.astro";
   one section to draft, one file to write. Steps are not suggestions the agent
   may reorder or skip: the state machine decides which step is current, what
   it needs, and when the stage may advance. Run `spektacular plan steps` to
-  list the steps of a stage, or `spektacular plan status` to see where a
+  list the steps of a stage, or `spektacular status` to see where a
   running one has got to.
 
   A **task** is one unit of work in a plan: it sits under a milestone, targets
@@ -151,7 +153,7 @@ import Button from "../components/Button.astro";
   task at a time. So a *stage* is one third of a workflow, while a *task* is one
   unit of work described by a plan. They are not the same unit, and the docs
   keep them distinct. See [Plan tasks](/plan-tasks/) for the task format and
-  how to export a plan's tasks.
+  how to see where a plan's tasks stand.
 
 </Section>
 
@@ -181,7 +183,7 @@ import Button from "../components/Button.astro";
   before the stage advances. The agent owns the work inside a step, and only
   that. This is why progress survives a context window ending, a crashed
   session, or a switch between agents — the state lives in `state.json` rather
-  than in a conversation, so `spektacular <stage> status` can always answer
+  than in a conversation, so `spektacular status` can always answer
   where things stand.
 
   The paper reports the practical effect of this split: on InterCode SQL, a
@@ -199,7 +201,9 @@ import Button from "../components/Button.astro";
     that give the planning agent what it needs. The Requirements and Constraints
     sections follow [ISO/IEC/IEEE 29148:2018](https://www.iso.org/standard/72089.html),
     the international standard for requirements engineering in systems and
-    software; the rest of the sections are ours.
+    software; the rest of the sections are ours. A spek started from existing
+    material records where its content came from in a `sources` list, and a
+    spek that belongs to an [epic](/epics/) names it in `epic`.
 
   </Fragment>
 
@@ -366,6 +370,28 @@ import Button from "../components/Button.astro";
       [config key](/configuration/). It always proposes before starting,
       never begins unilaterally.
 
+      **Starting from existing material.** Speks don't only start from a
+      conversation. Point Spek at an issue, a tracker epic, a design
+      document, a file, a web page or pasted text ("spec from #45"), and it
+      fetches the material with your agent's own tools, drafts every section
+      it can, lists what the material leaves out, and asks only about those
+      gaps. Each section step then presents its pre-filled draft for you to
+      confirm or refine, rather than asking from scratch. If the agent has no
+      tool that can reach the source, it says so and asks you to paste the
+      content. The spek records where its content came from in `sources`,
+      with the date each one was retrieved:
+
+      ```yaml
+      sources:
+          - uri: https://github.com/hivecommons/spektacular/issues/70
+            retrieved_date: "2026-09-28"
+      ```
+
+      Spektacular itself never fetches anything: the agent does, and the CLI
+      only records the provenance. A source that already lists child items,
+      such as a tracker epic with sub-issues, leads to an offer to set up an
+      [epic](/epics/) with one spek per child instead of a single spek.
+
     </Fragment>
 
   </PipelineStage>
@@ -403,19 +429,22 @@ import Button from "../components/Button.astro";
 
   </PipelineStage>
 
-  <PipelineStage number="3" heading="Implement the Plan">
+  <PipelineStage number="3" heading="Implement the Spek">
 
     <PipelineNode kind="file" icon="📋" label="plan.md" sub="implementation plan<br>+ research + context" />
     <PipelineConnector />
-    <PipelineNode kind="step" name="Implement" sub="executes plan via<br>coding agent" detail="validates against<br>acceptance criteria" />
+    <PipelineNode kind="step" name="Implement" sub="implements the spek via<br>coding agent" detail="validates against<br>acceptance criteria" />
     <PipelineConnector />
     <PipelineNode kind="output" icon="✅" label="code" sub="working implementation<br>verified by criteria" />
 
     <Fragment slot="body">
 
-      **Implement** drives the coding agent through each phase of the plan
+      **Implement** carries out a spek: you name the spek to implement, and
+      Spek drives the coding agent through each phase of its plan
       and verifies the output against your acceptance criteria, so you know
-      the implementation matches the spek.
+      the implementation matches the spek. A spek that belongs to an
+      [epic](/epics/) is first checked against the speks it depends on, so
+      you know before the first task if one of them is not implemented yet.
 
       Before it starts, Spek checks the plan's phases against the
       spek's Requirements and Acceptance Criteria checklist: any gap must

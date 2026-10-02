@@ -31,13 +31,14 @@ import Button from "../components/Button.astro";
   </Fragment>
 
   ```yaml
-  schema: 3                       # settings format version; `migrate` raises it
+  schema: 4                       # settings format version; `migrate` raises it
   written_by: 0.16.0              # the Spektacular version that last wrote this file
   skills_version: 0.16.0          # the Spektacular version that installed the agent skills
 
   command: spektacular
   agent: claude
   spec_trigger_threshold: moderate
+  epic_split_threshold: moderate
   auto_commit: "off"              # off | workflow | full
 
   debug:
@@ -60,6 +61,12 @@ import Button from "../components/Button.astro";
     provider: file
     config:
       directory: changelog
+
+  epic:
+    provider: file
+    strict_dependencies: false    # true refuses to implement past an unmet dependency
+    config:
+      directory: epics            # created the first time an epic is written
 
   knowledge:
     sources:                        # the project's shared stores only; each
@@ -87,10 +94,10 @@ import Button from "../components/Button.astro";
 
   <Fragment slot="sub">
 
-    Fourteen top-level keys control the tool from `.spektacular/config.yaml`:
+    Sixteen top-level keys control the tool from `.spektacular/config.yaml`:
     `schema`, `written_by`, `skills_version`, `command`, `agent`,
-    `spec_trigger_threshold`, `auto_commit`, `debug`, `spec`, `plan`,
-    `changelog`, `knowledge`, `design`, and `repos`.
+    `spec_trigger_threshold`, `epic_split_threshold`, `auto_commit`, `debug`,
+    `spec`, `plan`, `changelog`, `epic`, `knowledge`, `design`, and `repos`.
 
   </Fragment>
 
@@ -144,6 +151,21 @@ import Button from "../components/Button.astro";
     than one requirement), or `lenient` (offers readily, including small
     fixes). Read live at the moment the agent decides whether to offer, so a
     change here takes effect immediately, mid-conversation.
+
+  </ConfigKey>
+
+  <ConfigKey name="epic_split_threshold" type="string" defaultValue="<code>moderate</code>">
+
+    How readily the agent offers to split a complete spek that turns out to be
+    more than one piece of work into an [epic](/epics/). One of `strict`
+    (only on a strong signal, such as requirements that fall into groups that
+    could each ship alone), `moderate` (default: one strong signal, or two weak
+    signals together), or `lenient` (one strong signal or a single weak signal
+    is enough). Separate from `spec_trigger_threshold`, and never a stand-in for
+    it. At every level the agent must still name at least two speks that can
+    each be verified on their own, and code plus its docs, tests or config is
+    always one spek. Read live at the moment the agent decides whether to
+    offer, so a change here takes effect immediately.
 
   </ConfigKey>
 
@@ -236,6 +258,28 @@ import Button from "../components/Button.astro";
     are relative to the folder holding `config.yaml`, for example
     `changelog/<name>.md`. Records are addressed by name, never by this
     location: see [Documents](/documents/).
+
+  </ConfigKey>
+
+  <ConfigKey name="epic" type="section" defaultValue="file provider, warn on unmet dependencies, <code>epics</code>">
+
+    How [epics](/epics/) are stored, and how implementation treats a
+    dependency between an epic's speks that is not implemented yet.
+
+    - `epic.provider`: storage backend; only `file` ships today.
+    - `epic.strict_dependencies`: what happens when you start implementing a
+      spek whose dependencies are not all implemented. `false` (default)
+      warns, names each unmet dependency and its state, and lets you continue,
+      recording the override in the changelog. `true` refuses, and offers to
+      implement the first unmet dependency that is ready instead.
+    - `epic.config.directory`: where the file provider writes epics. Defaults
+      to `epics`, relative to the folder holding `config.yaml`, so epics land
+      in `.spektacular/epics`. The directory is created the first time an epic
+      is written, never by `init`. A directory outside the project is refused.
+
+    `init` writes this section for new projects and `migrate` adds it to
+    existing ones. Using epics stays optional: a project that never splits a
+    spek sees no change in behaviour.
 
   </ConfigKey>
 
@@ -480,6 +524,10 @@ import Button from "../components/Button.astro";
     present on disk, through as many formats as each file is behind
   - keeps a `.v<N>.old` copy of each file it rewrites, named after the
     format the file started at
+  - adds settings a newer format introduced, with their defaults, while
+    keeping any value you already set: moving to format 4 adds
+    `epic_split_threshold: moderate` and the `epic` section (provider `file`,
+    `strict_dependencies: false`, directory `epics`)
   - skips repositories that are not checked out locally and names each one;
     they are upgraded the next time they are set up
   - reinstalls the agent skills when they are older than the running

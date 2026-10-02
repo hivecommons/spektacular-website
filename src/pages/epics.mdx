@@ -1,0 +1,381 @@
+---
+layout: ../layouts/Shell.astro
+title: "Epics - Spektacular"
+description: "What an epic is, when Spektacular offers to split a spek into one, how to start from a tracker epic, and how dependencies between an epic's speks are checked when implementation starts."
+---
+import Hero from "../components/sections/Hero.astro";
+import Section from "../components/sections/Section.astro";
+import Prose from "../components/sections/Prose.astro";
+import CtaBanner from "../components/sections/CtaBanner.astro";
+import Button from "../components/Button.astro";
+
+<Hero
+  heading="Epics"
+  sub="Split a request that is too big for one spek into specs that each carry their own criteria."
+/>
+
+<Section heading="What an epic is" surface={false}>
+
+  <Prose nested>
+
+  When a request is too big for one spek, the interview tends to end with
+  acceptance criteria too thin to build from, and the implementing agent fills
+  the gaps with its own assumptions. An epic fixes that by grouping several
+  speks that together deliver the one request, each with its own testable
+  criteria.
+
+  An epic holds an overview and the list of its speks with the dependencies
+  between them, and nothing else. Requirements, constraints, non-goals and
+  every acceptance criterion live in the speks. An epic is never planned or
+  implemented itself: each of its speks is planned and implemented on its own,
+  exactly like a standalone spek, and everything a plan needs is in its spek.
+
+  An epic lists its speks in `specs`, each entry carrying the speks in the same
+  epic it depends on. `depends_on` is always present, and is `[]` when there
+  are none. List order is display order:
+
+  ```yaml
+  ---
+  created_date: "2026-09-28"
+  document_status: draft
+  spec: 000060_epics-and-seeded-specs
+  specs:
+      - name: 000060_epics-and-seeded-specs
+        depends_on: []
+      - name: 000061_epic-split
+        depends_on: [000060_epics-and-seeded-specs]
+  sources:
+      - uri: https://github.com/hivecommons/spektacular/issues/55
+        retrieved_date: "2026-09-28"
+  ---
+  ```
+
+  `spec` names the spek whose split produced the epic, and `sources` records
+  the material the epic was started from. Each spek in the epic names it in
+  `epic`, and Spek always writes both sides of that link together:
+
+  ```yaml
+  ---
+  created_date: "2026-09-28"
+  document_status: final
+  epic: 000060_epics-and-seeded-specs
+  ---
+  ```
+
+  A spek belongs to at most one epic, and epics don't nest. Using epics is
+  optional: a project that never splits a spek sees no change in behaviour.
+
+  </Prose>
+
+</Section>
+
+<Section heading="When Spek offers a split" surface>
+
+  <Fragment slot="sub">
+
+    One question decides it: is this more than one independently useful piece
+    of work? Size alone is not the test.
+
+  </Fragment>
+
+  <Prose nested>
+
+  The check runs once, when a spek is complete at the end of its workflow, and
+  whenever you ask for a split, at any point and on any spek, including one
+  written long ago. It never runs during open-ended discussion.
+
+  **The gate.** Spek offers a split only if it can name at least two
+  speks, each with its own overview and at least one acceptance criterion that
+  can be verified without the others. If it cannot name them, it does not
+  offer, however many signals have fired. Every offer is concrete.
+
+  **Strong signals.** Any one is enough, provided the gate passes:
+
+  - the source the spek was started from lists child items (sub-issues, a task
+    list);
+  - the requirements fall into groups that could each ship and be useful alone;
+  - the acceptance criteria cannot all be verified by one change;
+  - your own wording phases the work ("phase 1", "first … then later", "v1 is
+    just …").
+
+  **Weak signals.** At least two together are needed:
+
+  - more than about seven requirements;
+  - more than one design document needed;
+  - an interview that did not converge, where each answer opened new areas;
+  - a section draft that kept growing content belonging to a different concern.
+
+  **Code plus its docs is one spek.** Docs, tests, migrations, config,
+  changelog entries, and skill or template updates that describe or support the
+  same change belong in the same spek. Touching several repos or surfaces is
+  not a signal in itself. Requirements so tightly coupled that neither part is
+  useful or testable alone suppress the offer even when signals have fired.
+
+  **Never automatic.** Spek offers, naming each proposed spek with its
+  one-line scope, and waits for your decision. Declining continues exactly as
+  if no split had been offered, and the offer comes back only if the scope
+  visibly grows afterwards.
+
+  </Prose>
+
+</Section>
+
+<Section heading="Split sensitivity" surface={false}>
+
+  <Prose nested>
+
+  How readily the check fires is set by `epic_split_threshold` in
+  `.spektacular/config.yaml`:
+
+  ```yaml
+  epic_split_threshold: moderate   # strict | moderate | lenient
+  ```
+
+  - `strict`: only on a strong signal, and only when each proposed spek could
+    ship on its own today. Weak signals alone never lead to an offer.
+  - `moderate` (default): one strong signal, or two weak signals together.
+  - `lenient`: one strong signal, or a single weak signal, is enough.
+
+  The setting moves only the signal counts. The gate, the supporting-work rule
+  and the counter-signals apply at every level. It is separate from
+  `spec_trigger_threshold`, which sets how readily the agent offers to start a
+  spek in the first place, and the agent reads it at the moment it decides, so
+  a change takes effect immediately. See the
+  [configuration reference](/configuration/).
+
+  </Prose>
+
+</Section>
+
+<Section heading="What a split produces" surface>
+
+  <Fragment slot="sub">
+
+    A split redistributes a complete spek's content into several complete
+    speks in one step, with no further interviews.
+
+  </Fragment>
+
+  <Prose nested>
+
+  A split always acts on a complete spek. If you ask for one mid-workflow, the
+  request is noted, the workflow carries on gathering every section, and the
+  split happens once the spek is complete. Every requirement and criterion is
+  already written and agreed by then, so nothing needs to be asked twice.
+
+  You and the agent agree the list of speks, the dependencies between them, and
+  where every piece of content goes:
+
+  - every requirement and acceptance criterion goes to exactly one spek;
+  - a constraint or non-goal that applies to several speks is copied into each,
+    so every spek stays complete on its own;
+  - the overall overview moves to the epic, and each spek gets its own;
+  - a thin acceptance criterion is filled in with you now, which is the
+    problem a split exists to fix.
+
+  One fresh-eyes review then covers every resulting spek at once. Finally the
+  epic and every new spek are written in one step, each new spek complete and
+  `final`. The spek being split keeps its name, becomes the epic's first spek,
+  and is narrowed to its own part. If anything fails part-way, every document
+  is restored. Splitting a spek that already belongs to an epic adds the new
+  speks to that same epic.
+
+  ```
+  Agent:  This sounds like more than one spek. Split it into an epic with
+          these 3 speks?
+            1. 000060_epics-and-seeded-specs: the epic store and links
+            2. epic-split: detection, the split step and chaining
+            3. spec-seeding: starting a spek from existing material
+  You:    yes, but seeding doesn't need to wait for the split work
+  Agent:  Agreed. Both depend only on the first. Here is where each
+          requirement and criterion goes, and the constraints copied into
+          all three. Shall I run the review?
+  You:    go ahead
+  Agent:  Review done, two fixes applied. Wrote the epic
+          000060_epics-and-seeded-specs and the speks 000061_epic-split and
+          000062_spec-seeding, each ready to plan on its own.
+  ```
+
+  If the spek being split already had a plan, that plan goes stale, as it
+  would after any other change to its spek.
+
+  </Prose>
+
+</Section>
+
+<Section heading="Starting with an epic" surface={false}>
+
+  <Fragment slot="sub">
+
+    Not every epic comes from a split. Work that already arrives as a set of
+    items gets an epic first.
+
+  </Fragment>
+
+  <Prose nested>
+
+  **From a tracker epic.** When you start a spek from a source that already
+  lists child items, such as a tracker epic with sub-issues, Spek offers
+  to create an epic first, with the parent as its source and no speks yet.
+  Each child is then specified as its own spek in that epic, through the normal
+  spec workflow, seeded from that child.
+
+  **Chaining.** When a spek in the epic finishes, the agent re-reads the epic's
+  source and offers to start a spek for the next child item that has none yet.
+  You can stop at any point and pick up later. The offer stops at specifying:
+  it never offers to plan or implement the next spek.
+
+  **Joining an epic.** In a project that has epics, starting a new spek has the
+  agent ask whether it belongs to one, unless your request already says. When
+  it does, the agent reads the epic and every spek in it first, so the
+  interview builds on what they already cover and offers to record dependencies
+  on them. The CLI call it makes carries the epic:
+
+  ```bash
+  spektacular spec new --data '{"name":"spec-list-json","epic":"000060_epics-and-seeded-specs"}'
+  ```
+
+  **Adding to a completed epic.** An epic is complete once every one of its
+  speks is implemented. Adding a spek to it, whether by starting one in it,
+  listing one with `epic write` or splitting into it, is refused with
+  `epic_complete` and nothing is written. Once you confirm, the agent repeats
+  the call with `"confirm_completed_epic": true`, the spek is added, and the
+  epic is reported as in progress again until the new spek is implemented.
+
+  </Prose>
+
+</Section>
+
+<Section heading="Dependencies between specs" surface>
+
+  <Fragment slot="sub">
+
+    Spek B depends on spek A when B cannot be implemented until A has been.
+    Writing and planning B are never held back.
+
+  </Fragment>
+
+  <Prose nested>
+
+  Dependencies are checked at one point only: when implementation of a spek
+  starts, before its first task. Specifying and planning ahead is normal, so a
+  spek can be written and planned in any order. A standalone spek has no
+  dependencies.
+
+  A spek counts as implemented only when its plan exists and every task in it
+  is complete. A `final` spek is only written, and a spek with a plan is only
+  planned. Each direct dependency is classified as one of:
+
+  - `unplanned`: it has no plan yet;
+  - `stale`: its plan is stale because its spek changed after it;
+  - `planned, not started`: its plan has none of its tasks complete;
+  - `in progress (k/N)`: some, but not all, of its plan's tasks are complete;
+  - `implemented`: every task in its plan is complete.
+
+  When every dependency is implemented, implementation starts silently.
+  Otherwise, by default, Spek names each unmet dependency and its state
+  and asks whether to continue. Continuing is recorded in the changelog, so the
+  override is visible later. Stopping leads to an offer to implement the first
+  unmet dependency that is itself ready.
+
+  ```json
+  {
+    "error": true,
+    "code": "dependencies_unmet",
+    "message": "000061_epic-split depends on 000060_epics-and-seeded-specs, which is in progress (2/5 tasks complete)",
+    "resource": "000061_epic-split",
+    "next_action": "tell the user each unmet dependency and its state, and ask whether to continue anyway; if they choose to continue, re-run spektacular implement new --data '{\"name\":\"000061_epic-split\",\"override_dependencies\":true}'; otherwise implement the first ready dependency instead: spektacular implement new --data '{\"name\":\"000060_epics-and-seeded-specs\"}'"
+  }
+  ```
+
+  Set `epic.strict_dependencies: true` to remove the override. An unmet
+  dependency is then always refused: with `dependencies_unmet`, offering no
+  override, or with `dependency_override_refused` if the override is given
+  anyway. Either refusal names the first unmet dependency that is ready to
+  implement instead, so the epic is always implemented in order:
+
+  ```yaml
+  epic:
+    strict_dependencies: true
+  ```
+
+  Only direct dependencies are checked. A dependency counts as implemented only
+  when its own plan is complete, so a missing dependency further down the chain
+  shows up through it.
+
+  </Prose>
+
+</Section>
+
+<Section heading="Working with epics from the command line" surface={false}>
+
+  <Fragment slot="sub">
+
+    Agents reach epics through the CLI rather than by reading files directly,
+    as they already do for speks, plans and changelog records.
+
+  </Fragment>
+
+  <Prose nested>
+
+  List the epics in the store, and read one. The bytes go to stdout unchanged:
+
+  ```bash
+  spektacular epic list
+  spektacular epic read 000060_epics-and-seeded-specs
+  ```
+
+  Write an epic's body from a file, and its speks, dependencies and sources
+  through `--data`. Every spek listed is linked to the epic, and any field you
+  leave out keeps its current value, so a body-only rewrite never drops the
+  graph. An epic can be written with no speks yet, for the epic-first route:
+
+  ```bash
+  spektacular epic write 000060_epics-and-seeded-specs --from ./epic.md \
+    --data '{"specs":[{"name":"000060_epics-and-seeded-specs","depends_on":[]},{"name":"000061_epic-split","depends_on":["000060_epics-and-seeded-specs"]}],"sources":[{"uri":"https://github.com/hivecommons/spektacular/issues/55"}]}'
+  ```
+
+  The CLI stamps each source's `retrieved_date` itself. A write is refused if
+  an entry has no `name` or `depends_on`, names the same spek twice, depends on
+  a spek outside the epic, or forms a cycle.
+
+  Split a complete spek from one staged JSON description carrying every
+  section of every resulting spek. Print its full shape with `--schema`:
+
+  ```bash
+  spektacular epic split --schema
+  spektacular epic split --from ./split.json
+  ```
+
+  Delete an epic. The `epic` field is cleared on every spek it listed, and the
+  speks themselves are kept:
+
+  ```bash
+  spektacular epic delete 000060_epics-and-seeded-specs
+  ```
+
+  To see where an epic stands, give `spektacular status` the name of the epic
+  or of any spek or plan in it. It reports the whole epic: each spek's state,
+  what blocks it, and every plan's tasks. See
+  [Plan tasks](/plan-tasks/) for the status view.
+
+  ```bash
+  spektacular status 000061_epic-split
+  ```
+
+  </Prose>
+
+</Section>
+
+<CtaBanner heading="See it in the workflow">
+  <Fragment slot="body">
+    Splitting happens when a spek is complete, and dependencies are checked
+    when implementation starts. See where both sit in the spec-driven pipeline.
+  </Fragment>
+  <Button
+    href="/how-it-works/"
+    label="How it works →"
+    variant="primary"
+    large
+  />
+</CtaBanner>
