@@ -130,8 +130,13 @@ import Button from "../components/Button.astro";
   <ConfigKey name="agent" type="string" defaultValue="set by <code>spektacular init &lt;agent&gt;</code>">
 
     Which coding agent to drive during the implement workflow. Supported
-    values: `claude` (Claude Code), `bob`, and `codex`. New agents register
+    values: `claude` (Claude Code), `bob`, `codex`, and `omp` (oh-my-pi). New agents register
     via the [Agent plugin interface](/plugins/).
+
+    On shared projects, each `spektacular init <agent>` records that agent here.
+    Migration refreshes only the recorded agent's files, leaving other agents'
+    copies behind. After upgrading, run `spektacular init` once for each agent
+    to refresh every copy; otherwise omp may list both current and stale skills.
 
   </ConfigKey>
 

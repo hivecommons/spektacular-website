@@ -8,6 +8,7 @@ export const AGENTS = [
   { id: "bob", label: "Bob", default: true },
   { id: "claude", label: "Claude" },
   { id: "codex", label: "Codex" },
+  { id: "omp", label: "oh-my-pi (omp)" },
 ] as const satisfies readonly Agent[];
 
 export type AgentId = (typeof AGENTS)[number]["id"];

@@ -62,6 +62,29 @@ import Button from "../components/Button.astro";
     `spektacular init codex`.
   </Plugin>
 
+  <Plugin slot="shipping" name="omp" status="shipping" badgeText="Agent">
+    Drives [oh-my-pi](https://omp.sh). Select it with `spektacular init omp`.
+    Installs six identical workflow skills in `.omp/skills/`, Markdown wrappers
+    and native input-preserving handlers in `.omp/commands/`, and eight
+    always-applied `spek-*.md` rules in `.omp/rules/`. The rules mirror only
+    Spektacular's sections of root `AGENTS.md`, so they remain visible beside
+    another tool's instruction file or the project's own `.omp/AGENTS.md`.
+    Other project instructions, skills, commands, rules and settings stay intact.
+
+    Start omp in the project's top folder: Spektacular commands only work there,
+    and omp's plain commands only appear there. Use `/spek-new your feature`
+    or `/skill:spek-new`; both forms work for all six workflows. The plain
+    commands forward the input unchanged, including quotes and whitespace.
+    Once root `AGENTS.md` exists, omp does not read root `CLAUDE.md`; put
+    instructions omp should see in `AGENTS.md` instead.
+
+    On a shared project, `init omp` records omp as its agent. Migration refreshes
+    only the recorded agent's files, so another agent's copies fall behind and
+    omp may list current and stale skills. After upgrading, run `spektacular
+    init` once for each agent to refresh everything. Identical copies are listed
+    once by omp.
+  </Plugin>
+
   <Plugin slot="planned" name="obsidian" status="planned" badgeText="Planned · Store">
     Knowledge Store backed by an Obsidian vault. Lets teams point Spek
     at the markdown they already curate.

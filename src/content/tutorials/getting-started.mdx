@@ -39,7 +39,7 @@ to match.
 
 Spek is a CLI and a collection of skills that integrates with your coding
 agent and drives Spec Driven Development end to end. It is agent-agnostic,
-shipping with adapters for Claude Code, Codex, and Bob, and it has a pluggable
+shipping with adapters for Claude Code, Codex, Bob, and oh-my-pi (omp), and it has a pluggable
 data layer so you can store your speks and knowledge base in whatever way works
 for you.
 
@@ -157,6 +157,21 @@ you can check your work against it at any time.
 
   </AgentBlock>
 
+  <AgentBlock for="omp">
+
+    Install [oh-my-pi](https://omp.sh) using its official installer:
+
+    ```bash
+    curl -fsSL https://omp.sh/install.sh | bash
+    omp --version
+    ```
+
+    Start `omp` and use `/login` to configure your model provider, or configure
+    the provider's API key as described in the oh-my-pi installation guide.
+    The integration's credential-free discovery tests were run on omp 18.6.0.
+
+  </AgentBlock>
+
 </Step>
 
 <Step spaced number="4" heading="Initialise your project">
@@ -197,6 +212,31 @@ you can check your work against it at any time.
     cd my-project
     spektacular init codex
     ```
+
+  </AgentBlock>
+
+  <AgentBlock for="omp">
+
+    ```bash
+    cd my-project
+    spektacular init omp
+    omp
+    ```
+
+    This installs the six skills in `.omp/skills/`, command wrappers and native
+    input-preserving handlers in `.omp/commands/`, and eight always-applied
+    standing-rule files in `.omp/rules/`, alongside the rules in root `AGENTS.md`.
+    It does not overwrite your own omp instruction or settings files.
+
+    **Start omp in the project's top folder.** Spektacular commands only work
+    there, and omp's plain commands only appear there. Once root `AGENTS.md`
+    exists, omp does not read root `CLAUDE.md`; put instructions omp should see
+    in `AGENTS.md` instead.
+
+    On a shared project, this records omp as the project's agent. Migration
+    refreshes only the recorded agent, so another agent's copies fall behind.
+    After upgrading, run `spektacular init` once for each agent to refresh all
+    files and avoid duplicate current/stale skills in omp.
 
   </AgentBlock>
 
@@ -256,6 +296,16 @@ skill:
 ```bash
 /spek-new
 ```
+
+<AgentBlock for="omp">
+
+  In omp, start with `/spek-new SQLite migration`, or `/skill:spek-new`.
+  Text after the plain command is passed to the workflow unchanged.
+  All six workflows support both forms: `spek-new`, `spek-plan`,
+  `spek-implement`, `spek-knowledge`, `spek-manage-repos`, and `spek-design`.
+  Follow the same interview and confirmation steps below.
+
+</AgentBlock>
 
 You will be prompted to enter the name of the feature that you want to build.
 
