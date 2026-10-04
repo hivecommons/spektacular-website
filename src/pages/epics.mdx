@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Shell.astro
 title: "Epics - Spektacular"
-description: "What an epic is, when Spektacular offers to split a spek into one, how to start from a tracker epic, and how dependencies between an epic's speks are checked when implementation starts."
+description: "What an epic is, when Spektacular offers to split a spek into one, how to start from a tracker epic, how dependencies between an epic's speks are checked, and how to plan and implement a whole epic with one request each."
 ---
 import Hero from "../components/sections/Hero.astro";
 import Section from "../components/sections/Section.astro";
@@ -29,6 +29,8 @@ import Button from "../components/Button.astro";
   every acceptance criterion live in the speks. An epic is never planned or
   implemented itself: each of its speks is planned and implemented on its own,
   exactly like a standalone spek, and everything a plan needs is in its spek.
+  To plan or implement every spek in an epic with one request, see
+  "Planning and implementing an epic" further down this page.
 
   An epic lists its speks in `specs`, each entry carrying the speks in the same
   epic it depends on. `depends_on` is always present, and is `[]` when there
@@ -307,7 +309,119 @@ import Button from "../components/Button.astro";
 
 </Section>
 
-<Section heading="Working with epics from the command line" surface={false}>
+<Section heading="Planning and implementing an epic" surface={false}>
+
+  <Fragment slot="sub">
+
+    Once an epic's speks are written, two requests take it the rest of the
+    way. Ask your agent to *plan this epic*, review the plans, then ask it to
+    *implement this epic*.
+
+  </Fragment>
+
+  <Prose nested>
+
+  Each spek still gets an ordinary plan and an ordinary implementation, the
+  same as if it had been run on its own. What changes is that your agent runs
+  them for you: one agent per spek, side by side wherever the dependencies
+  allow, each following the standard plan or implement workflow.
+
+  ### Plan this epic
+
+  - Speks that are ready are planned side by side by separate agents.
+  - A spek waits until the speks it depends on are planned, so its plan can
+    build on theirs.
+  - Speks that already have a plan are skipped.
+  - Planning ends with a summary of every plan produced, for you to review
+    before anything is implemented. Changes you ask for are made to the plans
+    there and then.
+
+  ### Implement this epic
+
+  - It refuses up front if any spek has no plan, naming it, and implements
+    nothing. A dependency cycle, or a dependency on an unimplemented spek
+    outside the epic, is refused the same way.
+  - Each ready spek is built in its own git worktrees, one for each repo it
+    changes, on a branch named `spek/<spek>` in each. Inside them, every repo
+    the spek touches resolves to the spek's own copy, so speks running side by
+    side never touch each other's files.
+  - A spek is merged back before anything that depends on it starts. Its
+    changes are merged into every repo together, or not at all if any repo
+    would conflict.
+  - A conflict stops the run and is shown to you, with the conflicting files
+    for each repo. Spektacular never resolves one itself.
+
+  ### What still stops for you
+
+  Only genuine open questions: a decision with no reasonable default that only
+  you can make, such as "planning `000071_a` needs to know whether the export
+  keeps the old field". The other speks keep going while you answer. Planning
+  also stops once at the end, for the review. Everything else the agents decide
+  themselves and record, so you can check it in the review.
+
+  ### When something fails
+
+  If a spek fails, or you choose not to answer a question yet, nothing new
+  starts. Work already running is allowed to finish. You are told which spek
+  stopped the run, why, and what completed.
+
+  ### Picking up where you left off
+
+  Make the same request again. Finished speks are skipped, and an interrupted
+  spek resumes at the step it reached rather than starting over. While a run
+  goes, your agent reports progress after each change:
+
+  ```text
+  Planning 2 of 5 speks: 000071_a (tasks), 000073_c (discovery). 2 remaining.
+  ```
+
+  ### Seeing where an epic stands
+
+  Your agent works out what is left from `spektacular status`, and you can ask
+  it too. Naming an epic adds a `run` view: for planning and for implementing,
+  whether each spek is done, in progress, awaiting merge, ready or blocked, and
+  what blocks the epic from being implemented. Trimmed:
+
+  ```bash
+  spektacular status 000070_example --format json
+  ```
+
+  ```json
+  {
+    "epic": {
+      "name": "000070_example",
+      "run": {
+        "order": ["000071_a", "000073_c", "000072_b"],
+        "plan": { "done": 3, "in_progress": 0, "ready": 0, "blocked": 0, "remaining": 0 },
+        "implement": { "done": 1, "in_progress": 1, "awaiting_merge": 0, "ready": 0, "blocked": 1, "remaining": 2 },
+        "dirty": false,
+        "problems": []
+      }
+    },
+    "specs": [
+      {
+        "name": "000073_c",
+        "run": {
+          "plan": { "state": "done" },
+          "implement": { "state": "in_progress", "current_step": "verify", "repos": ["app", "docs"] }
+        }
+      },
+      {
+        "name": "000072_b",
+        "run": {
+          "plan": { "state": "done" },
+          "implement": { "state": "blocked", "waiting_on": ["000073_c"] }
+        }
+      }
+    ]
+  }
+  ```
+
+  </Prose>
+
+</Section>
+
+<Section heading="Working with epics from the command line" surface>
 
   <Fragment slot="sub">
 
