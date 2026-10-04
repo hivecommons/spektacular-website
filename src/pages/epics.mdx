@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Shell.astro
 title: "Epics - Spektacular"
-description: "What an epic is, when Spektacular offers to split a spek into one, how to start from a tracker epic, how dependencies between an epic's speks are checked, and how to plan and implement a whole epic with one request each."
+description: "What an epic is, when Spektacular offers to split a spek into one, how to start from a tracker epic, how dependencies between an epic's speks are checked, and how to plan and implement a whole epic with one request each, including the planning summary and the order added for speks that change the same files."
 ---
 import Hero from "../components/sections/Hero.astro";
 import Section from "../components/sections/Section.astro";
@@ -305,6 +305,9 @@ import Button from "../components/Button.astro";
   when its own plan is complete, so a missing dependency further down the chain
   shows up through it.
 
+  Planning an epic can add a dependency itself, when two speks change the same
+  files and nothing orders them. See [Plan this epic](#plan-this-epic).
+
   </Prose>
 
 </Section>
@@ -332,9 +335,17 @@ import Button from "../components/Button.astro";
   - A spek waits until the speks it depends on are planned, so its plan can
     build on theirs.
   - Speks that already have a plan are skipped.
-  - Planning ends with a summary of every plan produced, for you to review
-    before anything is implemented. Changes you ask for are made to the plans
-    there and then.
+  - Planning keeps a summary document with the epic: the decisions you need to
+    make come first, then any order Spektacular added, then one section for
+    each plan. Making the same request again adds sections for newly planned
+    speks and keeps the others.
+  - Speks whose plans change the same files, and that nothing orders yet, are
+    ordered for you: the spek listed later waits for the one listed earlier.
+    Nothing is re-planned, and the summary names the shared files.
+  - Planning ends with a review that walks the summary before anything is
+    implemented. Changes you ask for are made to the plan and to its section
+    together, and you can remove an added order there. Once removed, it is
+    never added back.
 
   ### Implement this epic
 
@@ -358,6 +369,15 @@ import Button from "../components/Button.astro";
   keeps the old field". The other speks keep going while you answer. Planning
   also stops once at the end, for the review. Everything else the agents decide
   themselves and record, so you can check it in the review.
+
+  Planning also stops to ask when a plan would contradict something you
+  already decided: a choice in the spek, in a design it references, or an
+  entry in the knowledge base. It never leaves that as a task for a person or
+  a note for the review, and the other speks keep planning while you answer.
+  This applies when you plan a single spek too. When plans disagree with each
+  other on a rule for the whole project, such as how the changelog is kept,
+  the summary lists it under the decisions to settle with one proposed answer,
+  and settling it updates every plan involved.
 
   ### When something fails
 
@@ -462,10 +482,26 @@ import Button from "../components/Button.astro";
   ```
 
   Delete an epic. The `epic` field is cleared on every spek it listed, and the
-  speks themselves are kept:
+  speks themselves are kept. The epic's planning summary is deleted with it:
 
   ```bash
   spektacular epic delete 000060_epics-and-seeded-specs
+  ```
+
+  Read the summary that planning an epic keeps, or update one section of it.
+  A section is `decisions` or the name of one of the epic's speks:
+
+  ```bash
+  spektacular epic summary read 000070_example
+  spektacular epic summary write 000070_example --data '{"section":"decisions"}' --from ./decisions.md
+  ```
+
+  Order speks whose plans change the same files, or undo one added order. An
+  order you undo is remembered on the epic, so it is never added again:
+
+  ```bash
+  spektacular epic order 000070_example
+  spektacular epic order 000070_example --data '{"unorder":{"spec":"000072_b","depends_on":"000071_a"}}'
   ```
 
   To see where an epic stands, give `spektacular status` the name of the epic
