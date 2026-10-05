@@ -335,10 +335,11 @@ import Button from "../components/Button.astro";
   - A spek waits until the speks it depends on are planned, so its plan can
     build on theirs.
   - Speks that already have a plan are skipped.
-  - Planning keeps a summary document with the epic: the decisions you need to
-    make come first, then any order Spektacular added, then one section for
-    each plan. Making the same request again adds sections for newly planned
-    speks and keeps the others.
+  - Planning keeps a summary document with the epic: the decisions you settled
+    come first, then any order Spektacular added, then one section for each
+    plan, listing the manual checks its test plan will ask for. Making the
+    same request again adds sections for newly planned speks and keeps the
+    others.
   - Speks whose plans change the same files, and that nothing orders yet, are
     ordered for you: the spek listed later waits for the one listed earlier.
     Nothing is re-planned, and the summary names the shared files.
@@ -376,8 +377,9 @@ import Button from "../components/Button.astro";
   a note for the review, and the other speks keep planning while you answer.
   This applies when you plan a single spek too. When plans disagree with each
   other on a rule for the whole project, such as how the changelog is kept,
-  the summary lists it under the decisions to settle with one proposed answer,
-  and settling it updates every plan involved.
+  you are asked once every spek is planned, with one proposed answer. Your
+  answer is applied to every plan involved before the summary is written, so
+  the summary never holds an open question.
 
   ### When something fails
 

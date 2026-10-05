@@ -108,7 +108,7 @@ import Button from "../components/Button.astro";
 
   <Fragment slot="sub">
 
-    The planning agent decides each task's executor against four criteria.
+    The planning agent decides each task's executor against three criteria.
 
   </Fragment>
 
@@ -120,14 +120,19 @@ import Button from "../components/Button.astro";
     consoles, signing keys);
   - action outside the repository (deploying, releasing, DNS, purchasing or
     approving something);
-  - judgement that must be a person's (legal or licensing, design sign-off, a
-    stakeholder decision);
-  - verification only a person can do (visual or UX review, physical hardware).
+  - physical work only a person can do (connecting, flashing or setting up
+    hardware).
 
   Anything else is `agent`. A task that would need both is split: the person's
   part becomes its own `human` task that depends on the agent's. When the plan
   is walked through for sign-off, the agent names every human task and its
   reason, so you know which work is waiting on a person.
+
+  A review is never a task. A design or UX review, a sign-off, or checking
+  behaviour by hand is something you look at rather than work that makes the
+  change exist, and a task for it would never be ticked. The plan lists each
+  review as a manual check instead, and implementation writes it into the
+  test plan with what to look at and what counts as passing.
 
   </Prose>
 
