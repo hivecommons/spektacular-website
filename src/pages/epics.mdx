@@ -354,14 +354,19 @@ import Button from "../components/Button.astro";
     nothing. A dependency cycle, or a dependency on an unimplemented spek
     outside the epic, is refused the same way.
   - Each ready spek is built in its own git worktrees, one for each repo it
-    changes, on a branch named `spek/<spek>` in each. Inside them, every repo
-    the spek touches resolves to the spek's own copy, so speks running side by
-    side never touch each other's files.
+    changes, on a branch named `spek/<spek>` in each. The worktrees hold only
+    code, so speks running side by side never touch each other's files.
+  - Specs, plans, changelogs and progress stay in your project the whole time.
+    Every agent runs Spektacular from the project, so you can follow a spek's
+    plan being ticked off while the run is going.
   - A spek is merged back before anything that depends on it starts. Its
     changes are merged into every repo together, or not at all if any repo
     would conflict.
   - A conflict stops the run and is shown to you, with the conflicting files
     for each repo. Spektacular never resolves one itself.
+  - A spek whose branch changes Spektacular's own files is not merged. Those
+    files are only ever written in the project, so the change is shown to you
+    to undo.
 
   ### What still stops for you
 
