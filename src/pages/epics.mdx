@@ -353,9 +353,15 @@ import Button from "../components/Button.astro";
   - It refuses up front if any spek has no plan, naming it, and implements
     nothing. A dependency cycle, or a dependency on an unimplemented spek
     outside the epic, is refused the same way.
+  - Before it starts, the run checks for uncommitted changes, but only in the
+    repos the epic's plans change, because a worktree starts from each repo's
+    last commit. A dirty repo the epic does not build is ignored, and status
+    names each dirty repo it does build in `dirty_repos`.
   - Each ready spek is built in its own git worktrees, one for each repo it
     changes, on a branch named `spek/<spek>` in each. The worktrees hold only
     code, so speks running side by side never touch each other's files.
+    Each new worktree is prepared with the repo's `worktree_setup` command,
+    if it declares one, such as installing its dependencies.
   - Specs, plans, changelogs and progress stay in your project the whole time.
     Every agent runs Spektacular from the project, so you can follow a spek's
     plan being ticked off while the run is going.
@@ -422,6 +428,7 @@ import Button from "../components/Button.astro";
         "plan": { "done": 3, "in_progress": 0, "ready": 0, "blocked": 0, "remaining": 0 },
         "implement": { "done": 1, "in_progress": 1, "awaiting_merge": 0, "ready": 0, "blocked": 1, "remaining": 2 },
         "dirty": false,
+        "dirty_repos": [],
         "problems": []
       }
     },

@@ -68,6 +68,9 @@ import Button from "../components/Button.astro";
     config:
       directory: epics            # created the first time an epic is written
 
+  implement:
+    worktrees: true               # false builds runs started on their own in the main checkouts
+
   knowledge:
     sources:                        # the project's shared stores only; each
       - name: team                  # repository declares its own in repo.yaml
@@ -94,10 +97,11 @@ import Button from "../components/Button.astro";
 
   <Fragment slot="sub">
 
-    Sixteen top-level keys control the tool from `.spektacular/config.yaml`:
+    Seventeen top-level keys control the tool from `.spektacular/config.yaml`:
     `schema`, `written_by`, `skills_version`, `command`, `agent`,
     `spec_trigger_threshold`, `epic_split_threshold`, `auto_commit`, `debug`,
-    `spec`, `plan`, `changelog`, `epic`, `knowledge`, `design`, and `repos`.
+    `spec`, `plan`, `changelog`, `epic`, `implement`, `knowledge`, `design`,
+    and `repos`.
 
   </Fragment>
 
@@ -288,6 +292,20 @@ import Button from "../components/Button.astro";
 
   </ConfigKey>
 
+  <ConfigKey name="implement" type="section" defaultValue="<code>worktrees: true</code>">
+
+    How implement runs build a spek.
+
+    - `implement.worktrees`: whether an implement run you start yourself
+      builds the spek in its own git worktrees, one per repo its plan
+      changes, on a branch named `spek/<spek>`, and merges them back when
+      the plan is complete. On by default, including in projects whose
+      configuration predates the setting. Set it to `false` to build in your
+      main checkouts as before. Epic runs always use worktrees, whatever
+      this says.
+
+  </ConfigKey>
+
   <ConfigKey name="knowledge" type="section" defaultValue="none">
 
     Ordered list of the shared knowledge stores the project itself owns, such
@@ -389,6 +407,7 @@ import Button from "../components/Button.astro";
   tags:
     - docs
     - website
+  worktree_setup: npm ci           # run in each new worktree of this repository
   source:
     provider: file                   # file or git
     config:
@@ -451,6 +470,18 @@ import Button from "../components/Button.astro";
 
     Free-form labels for the repository, such as `docs`, `website`, or
     `backend`.
+
+  </ConfigKey>
+
+  <ConfigKey name="worktree_setup" type="string" defaultValue="none">
+
+    A shell command run in each new worktree of this repository before an
+    implement run starts work, such as `npm ci`. A worktree holds only
+    tracked files, so this is where the dependencies a build needs are
+    prepared. It runs in the repository's folder inside the worktree, and
+    only when the worktree is first made. If it fails, the run is refused
+    with the command's output and the worktree is removed. Set it with
+    `repo add` or by editing `repo.yaml`.
 
   </ConfigKey>
 

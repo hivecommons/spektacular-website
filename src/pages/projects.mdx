@@ -288,12 +288,15 @@ import Button from "../components/Button.astro";
 
   </ConfigKey>
 
-  <ConfigKey name="description, role, tags" type="fields" defaultValue="none">
+  <ConfigKey name="description, role, tags, worktree_setup" type="fields" defaultValue="none">
 
     These live only in the repository's own `repo.yaml`, never in the
-    project's registry entry. Planning reads them to decide which repository
-    a requirement belongs to, so they are worth filling in. See
-    [Configuration](/configuration/) for the full reference.
+    project's registry entry. Planning reads the first three to decide which
+    repository a requirement belongs to, so they are worth filling in.
+    `worktree_setup` is the command that prepares each new worktree of the
+    repository, so it travels with the repository to every project that
+    registers it. See [Configuration](/configuration/) for the full
+    reference.
 
   </ConfigKey>
 

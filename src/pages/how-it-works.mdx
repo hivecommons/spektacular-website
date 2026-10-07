@@ -453,6 +453,20 @@ import Button from "../components/Button.astro";
       the implementation matches the spek. A spek that belongs to an
       [epic](/epics/) is first checked against the speks it depends on, so
       you know before the first task if one of them is not implemented yet.
+      A dependency that is implemented but not merged back yet counts as not
+      implemented, since its code is not in your main line.
+
+      Each implement run builds the spek in its own git worktrees, one for
+      each repo its plan changes, on a branch named `spek/<spek>`. Two runs
+      on different speks never see each other's half-finished changes, so
+      you can implement two speks side by side from two terminals. When the
+      plan is complete, the run merges its work back into every repo
+      together, or into none if any repo would conflict. A conflict is shown
+      to you with the files involved and left for you to resolve; Spek never
+      resolves one itself. After a clean merge the worktrees and branches are
+      removed. Set `implement.worktrees: false` in
+      [Configuration](/configuration/) to build in your main checkouts
+      instead.
 
       Before it starts, Spek checks the plan's phases against the
       spek's Requirements and Acceptance Criteria checklist: any gap must
