@@ -52,6 +52,7 @@ import Button from "../components/Button.astro";
 
   plan:
     provider: file
+    strict_spec_changes: false    # true: a spek edited after its plan makes the plan stale
     config:
       directory: plans
     task_id:
@@ -235,6 +236,11 @@ import Button from "../components/Button.astro";
       `.spektacular/plans`.
     - `plan.task_id.provider`: where task identifiers come from; `uuid`
       (default) issues random UUIDs. See [Plan tasks](/plan-tasks/).
+    - `plan.strict_spec_changes`: when `true`, a final plan is reported
+      `stale`, and implement refuses it, once its spek is edited after the plan
+      was approved. Defaults to `false`. A change recorded with `spec amend`
+      during an implement run does not make the plan stale. See
+      [Documents](/documents/).
 
     Every plan record also carries lifecycle metadata: a created date, a
     document status, and, once resolved, a closed date, tracked automatically

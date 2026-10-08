@@ -197,6 +197,12 @@ import Button from "../components/Button.astro";
   shipped design to match the implementation, and no command rewrites one to
   make it match. It records what was agreed.
 
+  **A design can be corrected while it is being built.** If an implement run
+  finds a design is wrong, it stops and asks. After you approve, the design is
+  revised with `design author`, keeping its capture date and references, or
+  replaced with a new version you supply for a design you wrote. The change is
+  then recorded on the spek with `spec amend`.
+
   A design document holds no back-links, so any number of speks may reference
   the same design and it outlives the feature that introduced it. Here is how a
   spek carries its references:

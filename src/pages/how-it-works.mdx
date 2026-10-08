@@ -475,6 +475,13 @@ import Button from "../components/Button.astro";
       was actually built, and writes a changelog record of what shipped,
       why, and how it differed from the plan to `.spektacular/changelog/`.
 
+      If implementing shows that the spek itself, or a design it references,
+      is wrong, the run stops rather than working around it. You approve an
+      amendment, it is applied in the project with `spektacular spec amend`
+      and recorded on the spek and in the plan's changelog, and the run
+      carries on against the corrected text. See "When the spek or a design
+      is wrong" on [Epics](/epics/).
+
     </Fragment>
 
   </PipelineStage>

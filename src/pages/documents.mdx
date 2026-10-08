@@ -80,6 +80,24 @@ import Button from "../components/Button.astro";
 
   `spektacular spec file delete <name>` removes a spec by the same name.
 
+  ### Amending a spek during implementation
+
+  `spektacular spec amend` changes a planned spek's Requirements, Acceptance
+  Criteria, Constraints or Success Metrics during an implement run, and
+  records why. Stage the full amended spek, then:
+
+  ```bash
+  spektacular spec amend --data '{"name":"000070_billing","reason":"Metric contradicted the rounding design","run":"interactive implement run, task 2.1"}' --from .spektacular/tmp/000070_billing/spec_amend.md
+  ```
+
+  It works out which sections changed and refuses a change to any other
+  section, or to the spek's earlier amendments. It appends a dated entry to the
+  spek's `## Amendments` section and records the amendment in its metadata, so
+  the plan is not made stale. Pass `"design":{"source":"…","path":"…"}`, with
+  or without `--from`, to record a revision made to a design the spek
+  references. A spek without a plan is refused: edit it with
+  `spektacular spec file write` instead.
+
   </Prose>
 
 </Section>

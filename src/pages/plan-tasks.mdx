@@ -390,7 +390,8 @@ import Button from "../components/Button.astro";
       rather than failing, so one broken link does not hide the rest of the
       epic.
     - `stale`: the spek changed after its plan was written, under
-      `plan.strict_spec_changes`.
+      `plan.strict_spec_changes`, unless the change was recorded with
+      `spec amend`.
     - `specified`: the spek is written and has no plan.
     - `planned`: a plan exists with none of its tasks complete.
     - `in_progress`: some of the plan's tasks are complete.

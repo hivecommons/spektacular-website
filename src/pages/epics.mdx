@@ -392,6 +392,47 @@ import Button from "../components/Button.astro";
   answer is applied to every plan involved before the summary is written, so
   the summary never holds an open question.
 
+  Implementing also stops when the spek itself, or a design it references,
+  turns out to be wrong. That is described next.
+
+  ### When the spek or a design is wrong
+
+  A child that finds a requirement, acceptance criterion, constraint or success
+  metric is wrong, or that the spek and a design disagree, stops and hands the
+  question back. It names the document, the section, the conflict and the
+  amendment it proposes. It never edits the spek or the design itself.
+
+  The orchestrator puts the question to you. If you approve, it applies the
+  amendment in the project, never in a worktree:
+
+  ```bash
+  spektacular spec amend --data '{"name":"<spek>","reason":"<why>","run":"epic <epic> implement run, task <task>"}' --from .spektacular/tmp/<spek>/spec_amend.md
+  ```
+
+  Only the Requirements, Acceptance Criteria, Constraints and Success Metrics
+  can be amended this way. A design is revised with `spektacular design author`
+  (or `design write` with your own version, for a design you wrote), keeping
+  its capture date and references, then recorded with `spec amend` and a
+  `design` field.
+
+  Every amendment is recorded on the spek itself, in an `## Amendments`
+  section that says what changed, when, why and in which run:
+
+  ```markdown
+  ## Amendments
+
+  - **2026-10-09: Success Metrics** (epic 000068_payments implement run, task 2.1)
+    Design rule rounds half-even; the metric said half-up.
+  ```
+
+  The child's plan changelog entry for the task records it too. A recorded
+  amendment does not make the plan stale, even with `plan.strict_spec_changes`,
+  so the child re-reads the corrected text, re-checks its task and carries on.
+  An amendment that would invalidate the plan's tasks still means re-planning.
+
+  The same path applies in a single `/spek-implement` run, where you are asked
+  directly instead of through an orchestrator.
+
   ### When something fails
 
   If a spek fails, or you choose not to answer a question yet, nothing new
