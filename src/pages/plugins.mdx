@@ -85,6 +85,13 @@ import Button from "../components/Button.astro";
     once by omp.
   </Plugin>
 
+  <Plugin slot="shipping" name="copilot" status="shipping" badgeText="Agent">
+    GitHub Copilot CLI loads the six workflow skills from `.github/skills/`
+    and the standing rules from root `AGENTS.md`. Select it with
+    `spektacular init copilot`, then start `/spek-new` inside a session.
+    See [Copilot CLI setup and limits](/copilot/).
+  </Plugin>
+
   <Plugin slot="planned" name="obsidian" status="planned" badgeText="Planned · Store">
     Knowledge Store backed by an Obsidian vault. Lets teams point Spek
     at the markdown they already curate.

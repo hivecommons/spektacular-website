@@ -39,7 +39,7 @@ to match.
 
 Spek is a CLI and a collection of skills that integrates with your coding
 agent and drives Spec Driven Development end to end. It is agent-agnostic,
-shipping with adapters for Claude Code, Codex, Bob, and oh-my-pi (omp), and it has a pluggable
+shipping with adapters for Claude Code, Codex, Bob, oh-my-pi (omp), and GitHub Copilot CLI, and it has a pluggable
 data layer so you can store your speks and knowledge base in whatever way works
 for you.
 
@@ -172,9 +172,37 @@ you can check your work against it at any time.
 
   </AgentBlock>
 
+  <AgentBlock for="copilot">
+
+    Install [GitHub Copilot CLI](https://docs.github.com/copilot/how-tos/copilot-cli)
+    and complete its sign-in setup. Verify the installation:
+
+    ```bash
+    copilot --version
+    ```
+
+  </AgentBlock>
+
 </Step>
 
 <Step spaced number="4" heading="Initialise your project">
+
+  <AgentBlock for="copilot">
+
+    From the project's top folder, initialise Spek and open Copilot:
+
+    ```bash
+    spektacular init copilot
+    copilot
+    ```
+
+    In the session, use `/spek-new SQLite migration`, then `/spek-plan` and
+    `/spek-implement` as you follow the walkthrough below. Copilot loads the six
+    skills from `.github/skills/` and standing rules from root `AGENTS.md`.
+    Commands passed to `copilot -p` are not expanded. See
+    [Copilot CLI limits, shared projects, and migration from the workaround](/copilot/).
+
+  </AgentBlock>
 
   Every repository you want to use Spek with needs to be initialised.
   This installs the skills into your coding agent and configures the local
