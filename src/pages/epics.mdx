@@ -568,6 +568,17 @@ import Button from "../components/Button.astro";
   spektacular status 000061_epic-split
   ```
 
+  While an epic is being planned or implemented, add `--watch` to follow it
+  live. The view stays on screen and refreshes every two seconds, so you can
+  see each spek move from ready to in progress to implemented, and which step
+  each running workflow is on, until you press Ctrl+C. With no name it follows
+  every workflow in progress, including the runs the orchestrator starts.
+
+  ```bash
+  spektacular status 000060_epics-and-seeded-specs --watch
+  spektacular status --watch --interval 5s
+  ```
+
   </Prose>
 
 </Section>

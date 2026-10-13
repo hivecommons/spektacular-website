@@ -181,15 +181,17 @@ import Button from "../components/Button.astro";
   <Prose nested>
 
   Give it an epic, a spek or a plan; you always get the whole epic. With no
-  name, it reports the workflow in progress. By default the report is a
-  readable tree:
+  name, it reports every workflow in progress. By default the report is a
+  readable tree, coloured when it goes to a terminal and plain text when it is
+  piped or `NO_COLOR` is set:
 
   ```console
   $ spektacular status 000061_epic-split
-  epic 000060_epics-and-seeded-specs  (draft)  1/3 specs implemented, 7/11 tasks
+  epic 000060_epics-and-seeded-specs  (draft)
+    ━━━━━━━━━━━━────────  1/3 specs implemented, 7/11 tasks
 
-    000060_epics-and-seeded-specs   implemented   5/5 tasks
-    000061_epic-split               in progress   2/6 tasks   ← requested
+    ✓ 000060_epics-and-seeded-specs   implemented   5/5 tasks
+    ◐ 000061_epic-split               in progress   2/6 tasks   ← requested
         depends on: 000060_epics-and-seeded-specs
         Milestone 1
           [x] Add the split detection partial           spektacular           agent
@@ -203,11 +205,13 @@ import Button from "../components/Button.astro";
               depends on: Add the split step to the spec workflow
           [ ] Publish the release notes                 spektacular           human: needs access to the release account
               depends on: Document epics on the website
-    000062_spec-seeding             specified     no plan
+    · 000062_spec-seeding             specified     no plan
         depends on: 000060_epics-and-seeded-specs
   ```
 
-  The spek you asked about is marked `← requested` and expanded down to its
+  Each spek's line starts with a mark for its state: `✓` implemented, `◐` in
+  progress, `○` planned, `·` specified, `!` stale and `✗` missing. The bar
+  under the epic's name shows its tasks complete. The spek you asked about is marked `← requested` and expanded down to its
   milestones and tasks; the other speks in the epic show one line each, with
   their task counts (`k/N tasks`, or `no plan`) and what they depend on. A spek
   that is not in an epic is reported on its own, without the `epic` header line.
@@ -308,15 +312,23 @@ import Button from "../components/Button.astro";
   The task lists are shortened here; the real report carries every task of
   every plan.
 
-  With no name, `status` reports the workflow in progress, whichever kind it
-  is. The readable tree gains a leading line, and the JSON report fills in its
-  `workflow` block:
+  With no name, `status` reports every workflow in progress, whichever kind
+  it is. That includes a run kept in its own lane under
+  `.spektacular/workflows/`: an implement run that builds in its own worktrees,
+  and each run an epic's orchestrator starts. The first one listed is the
+  shared workflow when there is one, then the lanes, most recently updated
+  first, and the report shows that first workflow's epic or spek in full. The
+  readable tree gains a leading list, and the JSON report fills in its
+  `workflow` block with the first and lists them all in `workflows`:
 
   ```console
   $ spektacular status
-  workflow in progress: implement 000061_epic-split, at step analyze
+  2 workflows in progress
+    ● implement  000061_epic-split    at step analyze  (orchestrated)
+    ● plan       000062_spec-seeding  at step overview  (orchestrated)
 
-  epic 000060_epics-and-seeded-specs  (draft)  1/3 specs implemented, 7/11 tasks
+  epic 000060_epics-and-seeded-specs  (draft)
+    ━━━━━━━━━━━━────────  1/3 specs implemented, 7/11 tasks
   ...
   ```
 
@@ -327,8 +339,27 @@ import Button from "../components/Button.astro";
       "name": "000061_epic-split",
       "current_step": "analyze",
       "completed_steps": ["new", "read_plan"],
-      "updated_at": "2026-09-30T10:12:00Z"
+      "updated_at": "2026-09-30T10:12:00Z",
+      "orchestrated": true
     },
+    "workflows": [
+      {
+        "kind": "implement",
+        "name": "000061_epic-split",
+        "current_step": "analyze",
+        "completed_steps": ["new", "read_plan"],
+        "updated_at": "2026-09-30T10:12:00Z",
+        "orchestrated": true
+      },
+      {
+        "kind": "plan",
+        "name": "000062_spec-seeding",
+        "current_step": "overview",
+        "completed_steps": ["new"],
+        "updated_at": "2026-09-30T10:05:00Z",
+        "orchestrated": true
+      }
+    ],
     "requested": "000061_epic-split"
   }
   ```
@@ -338,6 +369,17 @@ import Button from "../components/Button.astro";
   progress belongs to one of the speks or plans it reports, and `null`
   otherwise. With no name and nothing in progress, the readable form prints
   `no workflow in progress` and the JSON report is `{"workflow": null}`.
+
+  To keep an eye on a run, add `--watch`. It keeps the readable tree on
+  screen and redraws it in place every two seconds until you press Ctrl+C,
+  with or without a name. `--interval` changes how often, down to `200ms`:
+
+  ```console
+  $ spektacular status 000060_epics-and-seeded-specs --watch --interval 5s
+  ```
+
+  `--watch` works only with the readable tree; with `--format json` it is
+  refused, and a script should poll `status --format json` itself.
 
   `pretty` and `json` are the supported formats. Any other format, or a name
   that matches no epic, spek or plan, is refused with the CLI's usual
@@ -353,7 +395,17 @@ import Button from "../components/Button.astro";
 
     The workflow in progress, when it works on one of the reported speks or
     plans: its `kind` (`spec`, `plan` or `implement`), `name`, `current_step`,
-    `completed_steps` and `updated_at`. `null` otherwise.
+    `completed_steps` and `updated_at`, plus `orchestrated: true` when an
+    epic's orchestrator started it. `null` otherwise.
+
+  </ConfigKey>
+
+  <ConfigKey name="workflows" type="array">
+
+    With no name only: every workflow in progress, each shaped like
+    `workflow`. The shared workflow comes first, then each lane, most recently
+    updated first. `workflow` is its first entry. Absent when nothing is in
+    progress.
 
   </ConfigKey>
 
