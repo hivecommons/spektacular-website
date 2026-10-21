@@ -71,6 +71,10 @@ import Button from "../components/Button.astro";
 
   implement:
     worktrees: true               # false builds runs started on their own in the main checkouts
+    goal_check:
+      enabled: true               # false ticks criteria from verification, with no reviewer
+      models:                     # optional reviewer model per agent
+        claude: haiku
 
   knowledge:
     sources:                        # the project's shared stores only; each
@@ -298,7 +302,7 @@ import Button from "../components/Button.astro";
 
   </ConfigKey>
 
-  <ConfigKey name="implement" type="section" defaultValue="<code>worktrees: true</code>">
+  <ConfigKey name="implement" type="section" defaultValue="<code>worktrees: true</code>, <code>goal_check.enabled: true</code>">
 
     How implement runs build a spek.
 
@@ -309,6 +313,29 @@ import Button from "../components/Button.astro";
       configuration predates the setting. Set it to `false` to build in your
       main checkouts as before. Epic runs always use worktrees, whatever
       this says.
+    - `implement.goal_check.enabled`: whether a separate reviewer checks each
+      task's acceptance criteria before they are ticked. On by default,
+      including in projects whose configuration predates the setting. Set it
+      to `false` to tick criteria from the verification results as before.
+    - `implement.goal_check.models.<agent>`: the model the reviewer uses for
+      one coding agent (`claude`, `codex`, `copilot` or `omp`). Other agents
+      keep their defaults. The model is written into the reviewer when it is
+      installed, so re-run `spektacular init <agent>` after changing it.
+
+    Reviewer defaults and limits by agent:
+
+    - `claude`: `haiku`, with read and search tools only.
+    - `codex`: `gpt-6-luna`. Codex has no read-only mode for a helper, so its
+      reviewer is read-only by instruction only: it is told never to change a
+      file.
+    - `copilot`: `Claude Haiku 4.5`, with read and search tools only. When the
+      session model is `Auto`, Copilot ignores the helper's model.
+    - `omp`: `@smol`, which maps to your own cheap model, with read and search
+      tools only.
+    - `bob`: Bob has no per-helper model setting. The reviewer is Bob's
+      built-in read-only `explore` helper, on Bob's lighter model.
+
+    Your own agent settings that pin a helper's model take precedence.
 
   </ConfigKey>
 
