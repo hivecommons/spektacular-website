@@ -138,7 +138,7 @@ import Button from "../components/Button.astro";
   ├── Stage: Plan
   │   └── Steps: discovery → architecture → milestones → tasks → ...
   └── Stage: Implement
-      └── Steps: read_plan → implement → test → verify → ...
+      └── Steps: read_plan → analyze → implement → test → verify → check_goal → update_plan → ...
   ```
 
   A **stage** is one of Spec, Plan, or Implement. Each produces an artifact
@@ -441,7 +441,7 @@ import Button from "../components/Button.astro";
 
     <PipelineNode kind="file" icon="📋" label="plan.md" sub="implementation plan<br>+ research + context" />
     <PipelineConnector />
-    <PipelineNode kind="step" name="Implement" sub="implements the spek via<br>coding agent" detail="validates against<br>acceptance criteria" />
+    <PipelineNode kind="step" name="Implement" sub="implements the spek via<br>coding agent" detail="independent reviewer<br>checks each criterion" />
     <PipelineConnector />
     <PipelineNode kind="output" icon="✅" label="code" sub="working implementation<br>verified by criteria" />
 
@@ -455,6 +455,21 @@ import Button from "../components/Button.astro";
       you know before the first task if one of them is not implemented yet.
       A dependency that is implemented but not merged back yet counts as not
       implemented, since its code is not in your main line.
+
+      After each task's tests and checks pass, a separate reviewer checks the
+      task's goal: its acceptance criteria and the files it may change. The
+      reviewer starts fresh, sees only the goal, the check results and the work
+      itself, and changes nothing. It judges each criterion **met**, **not yet
+      met** or **impossible**, with the evidence it found. Only met criteria
+      are ticked. Work that is not yet met goes back for up to two more
+      attempts with the reviewer's reasons; after that, Spek asks you to keep
+      fixing, accept the shortfall or skip the task. An impossible criterion
+      stops the run at once so you can fix the plan. Every verdict is recorded;
+      read it back with `spektacular implement goal show <spek>`. In an
+      [epic](/epics/), a stop at the goal check reaches you as a question from
+      that spek, and its work is not merged until you answer. Switch the check
+      off with `implement.goal_check.enabled: false` in
+      [Configuration](/configuration/).
 
       Each implement run builds the spek in its own git worktrees, one for
       each repo its plan changes, on a branch named `spek/<spek>`. Two runs
