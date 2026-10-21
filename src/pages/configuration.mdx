@@ -574,12 +574,61 @@ import Button from "../components/Button.astro";
     they are upgraded the next time they are set up
   - reinstalls the agent skills when they are older than the running
     Spektacular, and records the new version only once that install succeeds
+  - converts the standing rules in `AGENTS.md` to their short form and
+    installs or refreshes the guidance files in `.spektacular/guidance/`,
+    leaving any content you added to `AGENTS.md` where it was
 
   Re-running `spektacular init <agent>` applies the same upgrades before it
   does anything else, so an existing project can also be brought current by
   setting it up again. A file written by a *newer* Spek is refused
   rather than converted: the error asks you to update Spek, and the
   file is never rewritten.
+
+</Section>
+
+<Section heading="Standing rules: AGENTS.md and .spektacular/guidance/" surface={true}>
+
+  <Fragment slot="sub">
+
+    Spektacular installs eight standing rules for your agent. Each sits in
+    your root `AGENTS.md` as a short statement, and its full guidance lives
+    in its own file that the agent opens only when the rule applies.
+
+  </Fragment>
+
+  Each rule keeps its own heading in `AGENTS.md`. Below it is the
+  obligation the agent must always honour, the situation that calls for
+  more detail, and a link such as
+  `[.spektacular/guidance/spec-trigger.md](.spektacular/guidance/spec-trigger.md)`.
+  Spektacular's part of `AGENTS.md` stays under 5 KB, so every session
+  starts lighter.
+
+  The full guidance lives in one file per rule:
+
+  ```text
+  .spektacular/guidance/
+    repo-sources.md
+    store-access.md
+    memory-context.md
+    knowledge-trigger.md
+    spec-trigger.md
+    design-trigger.md
+    draft-presentation.md
+    historical-artifacts.md
+  ```
+
+  Commit the folder with the project so the links resolve for everyone.
+  Agents read these files with their own tools when a rule sends them
+  there. They are never imported into a session up front.
+
+  Do not edit them: `init` writes the guidance files and `migrate` rewrites
+  them for each new Spektacular version, so local edits are lost. Put your
+  own rules in your own sections of `AGENTS.md`, which Spektacular never
+  changes.
+
+  Claude reads `AGENTS.md` through the `@AGENTS.md` import in `CLAUDE.md`.
+  Codex, Copilot and Bob read `AGENTS.md` directly. omp's always-applied
+  `.omp/rules/spek-*.md` files carry the same short statements.
 
 </Section>
 
