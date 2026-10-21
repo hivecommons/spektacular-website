@@ -26,12 +26,26 @@ debug:
   enabled: true
 ```
 
+To record a session without editing the config, set
+`SPEKTACULAR_SESSION_LOG=on` in the environment your agent runs in. Every
+`spektacular` command it runs is recorded, whatever `debug.enabled` says.
+Setting it to `off` does the opposite: a command run with it is left out
+of the log even when debug logging is on, which suits a tool that polls
+`status` every few seconds.
+
 ## What gets logged
 
-Once enabled, every `spektacular` command appends one line to
-`.spektacular/debug/session-log.jsonl`. The file is created on the first
-command run after enabling, and it is never truncated or rotated, each
-command adds one more line.
+Once enabled, every `spektacular` command appends one line to a session
+log file under `.spektacular/debug/`. Each spec, plan or implement
+workflow gets its own file, named for when it started, the agent the
+project is set up for, and the workflow, for example
+`20261001T090334.911373161Z_claude_plan_000008_debugging-docs.jsonl`.
+Commands run with no workflow in progress share a `no-active-workflow`
+file. When an epic is planned or implemented, each spec's workflow runs
+in its own lane and writes its own file, so specs worked on side by side
+never share one. Starting a workflow again, for example with `--force`,
+begins a new file. Files are never truncated or rotated: each command
+adds one more line.
 
 Here's a real sample line:
 
@@ -66,10 +80,10 @@ Here's a real sample line:
 
 ## Before you enable it
 
-The default `.spektacular/.gitignore` ignores `*.log`, but the debug log
-is named `session-log.jsonl`, so that pattern doesn't match it. If you
-enable debug logging, consider adding `.spektacular/debug/` to your own
-project's `.gitignore` so the growing log file doesn't end up committed.
+The default `.spektacular/.gitignore` ignores `*.log`, but session log
+files end in `.jsonl`, so that pattern doesn't match them. If you enable
+debug logging, consider adding `.spektacular/debug/` to your own
+project's `.gitignore` so the growing log files don't end up committed.
 
 </Prose>
 

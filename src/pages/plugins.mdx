@@ -54,7 +54,11 @@ import Button from "../components/Button.astro";
 
   <Plugin slot="shipping" name="bob" status="shipping" badgeText="Agent">
     Drives the Bob agent via its `.bob/skills` and `.bob/commands` layout.
-    Selected by `spektacular init bob`.
+    Selected by `spektacular init bob`. Bob stops every sub-agent after
+    `session.maxTurns` turns (100 by default), which cuts epic runs' children
+    off mid-step; `init bob` warns about it, and
+    `spektacular init bob --raise-bob-turn-limit` removes the limit in your
+    Bob settings.
   </Plugin>
 
   <Plugin slot="shipping" name="codex" status="shipping" badgeText="Agent">
