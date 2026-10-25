@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Shell.astro
 title: "Configuration - Spektacular"
-description: "Configure Spektacular via .spektacular/config.yaml and a member repository's own .spektacular/repo.yaml: command, agent, auto_commit, debug, spec, plan, knowledge, each repository's location, and where its code lives (source)."
+description: "Configure Spektacular via .spektacular/config.yaml and a member repository's own .spektacular/repo.yaml: command, agent, auto_commit, log, spec, plan, knowledge, each repository's location, and where its code lives (source)."
 ---
 import Hero from "../components/sections/Hero.astro";
 import Section from "../components/sections/Section.astro";
@@ -31,7 +31,7 @@ import Button from "../components/Button.astro";
   </Fragment>
 
   ```yaml
-  schema: 4                       # settings format version; `migrate` raises it
+  schema: 5                       # settings format version; `migrate` raises it
   written_by: 0.16.0              # the Spektacular version that last wrote this file
   skills_version: 0.16.0          # the Spektacular version that installed the agent skills
 
@@ -41,8 +41,12 @@ import Button from "../components/Button.astro";
   epic_split_threshold: moderate
   auto_commit: "off"              # off | workflow | full
 
-  debug:
-    enabled: false
+  log:
+    provider: file                # the logger; only file ships today
+    level: standard               # off | standard | verbose
+    retention: 10                 # most recent workflow runs kept
+    config:
+      directory: logs             # relative to the folder holding `config.yaml`
 
   spec:
     provider: file
@@ -106,7 +110,7 @@ import Button from "../components/Button.astro";
 
     Seventeen top-level keys control the tool from `.spektacular/config.yaml`:
     `schema`, `written_by`, `skills_version`, `command`, `agent`,
-    `spec_trigger_threshold`, `epic_split_threshold`, `auto_commit`, `debug`,
+    `spec_trigger_threshold`, `epic_split_threshold`, `auto_commit`, `log`,
     `spec`, `plan`, `changelog`, `epic`, `implement`, `knowledge`, `design`,
     and `repos`.
 
@@ -199,12 +203,18 @@ import Button from "../components/Button.astro";
 
   </ConfigKey>
 
-  <ConfigKey name="debug" type="section" defaultValue="<code>debug.enabled: false</code>">
+  <ConfigKey name="log" type="section" defaultValue="file provider, <code>level: standard</code>, <code>retention: 10</code>, <code>logs</code>">
 
-    Debug logging. Set `debug.enabled: true` to write a JSONL log of every
-    command to `.spektacular/debug/session-log.jsonl`, useful when reporting
-    issues or developing a new plugin. See the [Debugging](/debugging/) page
-    for the full walkthrough.
+    How Spektacular logs the commands it runs.
+
+    - `log.provider`: the logger; only `file` (the default) ships today.
+    - `log.level`: `off`, `standard` (default) or `verbose`.
+    - `log.retention`: how many recent workflow runs to keep, and how many
+      days of standalone commands. Defaults to 10.
+    - `log.config.directory`: where logs are written, relative to the folder
+      holding `config.yaml`. Defaults to `logs`.
+
+    See [Logging and debugging](/debugging/) for what each level records.
 
   </ConfigKey>
 
