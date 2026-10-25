@@ -112,6 +112,31 @@ it covers, the median and the 90th percentile. A step only some runs entered
 shows how many did. The 90th percentile is the nearest-rank value, so it is
 always a figure one of the runs had.
 
+## Listing commands and spans
+
+`spektacular stats commands` lists every command Spektacular recorded,
+oldest first: the run and step it ran in, the step it moved to, its
+arguments, how long it took and its exit code. `spektacular stats spans`
+lists every helper agent, wait on you and other marked span, with its step
+and how it ended.
+
+```bash
+spektacular stats commands --name 000075_run-stats-command
+spektacular stats spans --kind implement --format json
+spektacular stats commands --outside-runs   # what an epic orchestrator ran
+```
+
+Both take the same `--name`, `--kind`, `--agent`, `--run`, `--dir` and
+`--format` as the other commands. With no selection they list everything,
+in runs and outside them; with a selection, only the selected runs' records.
+`--outside-runs` shows only what was recorded outside any workflow run, such
+as the commands an epic orchestrator ran and the helpers it launched, and
+cannot be combined with a run selection. In JSON, commands carry `run_id`,
+`step`, `step_to`, `args`, `exit_code` and `message`, and spans carry
+`type`, `run_id`, `workflow`, `step`, `task_id`, `end_reason` and
+`complete`. Outside any run, `run_id` and `workflow` are `null`. A span that
+was never stopped is marked as unfinished, as in a run report.
+
 ## What each figure means
 
 - **Wall time**: from the run's first recorded event to its last. A run
@@ -180,6 +205,8 @@ example:
 Durations are integer milliseconds, times are RFC 3339 in UTC, and a figure
 that does not apply is `null`, never `0`. These field names are stable, and
 `--fields` narrows the output as for any other command.
+`stats commands` and `stats spans` give their records the same way, in a
+`commands` or a `spans` array whose field names are stable too.
 
 ## Logs from elsewhere
 
