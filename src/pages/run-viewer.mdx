@@ -1,0 +1,163 @@
+---
+layout: ../layouts/Shell.astro
+title: "Run viewer - Spektacular"
+description: "Open a recorded workflow run as a single-file HTML waterfall of its steps, tasks, helpers and waits."
+---
+import Hero from "../components/sections/Hero.astro";
+import Prose from "../components/sections/Prose.astro";
+import CtaBanner from "../components/sections/CtaBanner.astro";
+import Button from "../components/Button.astro";
+
+<Hero
+  heading="Run viewer"
+  sub="See a recorded run as a waterfall: every step, task, helper and wait on the user, on one timeline."
+/>
+
+<Prose>
+
+## Rendering a run
+
+`spektacular stats view` writes the latest run to a single HTML file and
+prints where it went.
+
+```text
+$ spektacular stats view
+Wrote plan 000075_run-stats-command (run 4bf92f35, 1234 spans) to /home/me/project/spektacular-run-4bf92f35.html
+```
+
+Open the file in any browser. It needs no server and no network, so it can
+be attached to a bug report or kept with a test run. The file is named
+after the first 8 characters of the run id and goes in the current
+directory. `--out report.html` writes it to a file of your choosing, and
+`--out some/dir/` puts the default name inside an existing directory. Writing
+again replaces the file. The page is never written into the logs directory:
+an `--out` inside it is refused.
+
+## Choosing the run
+
+`stats view` selects a run exactly as `stats run` does:
+
+- `--name <workflow name>`: the latest run of one spec, plan or implement workflow.
+- `--kind spec|plan|implement|repo`: the latest run of one kind.
+- `--agent <agent>`: the latest run by one agent.
+- `--run <id>`: one run, by its full id or its first 8 or more characters.
+
+The options combine, and the latest matching run is drawn. `spektacular
+stats list` shows the recorded runs and their ids.
+
+## Logs from elsewhere
+
+```bash
+spektacular stats view --dir path/to/collected/logs
+```
+
+`--dir` reads a logs directory copied from anywhere, such as a test run's,
+from any folder, with no project needed. The page is identical to one
+rendered in the project. Rendering never changes a log, and `stats view` is
+never logged itself.
+
+## Reading the waterfall
+
+Time runs left to right from the run's first recorded event, with the time
+axis along the top. Each bar is one span, drawn from its start for its
+duration, and indented under the span that contains it: tasks, then steps,
+then the commands, helper agents and waits inside them. Each type has its
+own look:
+
+| Type | Look |
+|------|------|
+| Task | Purple bar |
+| Step | Blue bar |
+| Helper agent (`sub-agent`) | Teal bar |
+| Wait on the user (`user-wait`) | Amber hatched bar, with an amber band across the whole timeline |
+| Other marked work (`work`) | Olive bar |
+| Command | Thin slate bar |
+
+The legend under the header repeats these, so the page explains itself.
+
+## Problems
+
+Work that did not finish well is marked on its bar and beside its name:
+
+- **Failed**: a red border and ✕, for a helper stopped with an error or a
+  command that exited with a non-zero code.
+- **Interrupted**: an orange dashed border and ‖.
+- **Abandoned**: a grey dotted border and ∅.
+- **Never closed**: a bar whose end fades out, and ….
+
+An interrupted, abandoned or unfinished bar ends where the span was cut
+off, as the run statistics report measures it. A collapsed row shows the
+strongest problem hidden inside it, so collapsing never hides a failure.
+
+## Gaps
+
+A stretch with no recorded event that is longer than the threshold is a
+hatched grey band across the timeline, labelled with its length. The
+threshold defaults to 5 minutes, or the value of `--gap-threshold 10m`, and
+can be changed in the page's Gap threshold box, in minutes. The gap count
+and total beside it follow the threshold, and match `stats run` at the same
+threshold.
+
+## Zooming and collapsing
+
+- Drag across the time axis to zoom to that range.
+- Hold Ctrl (Cmd on macOS) and scroll to zoom in or out at the pointer.
+- Double-click a bar to fit exactly that span.
+- Reset zoom, or Escape, shows the whole run again.
+
+The triangle beside a row collapses or expands its children, and a
+collapsed row says how many rows it hides. The page opens collapsed to
+steps, so tasks show their steps and each step hides what ran inside it.
+Expand all and Collapse to steps switch between the two.
+
+## Details, totals and the summary
+
+Selecting a bar shows its details: name, type, start, duration, status, end
+reason, agent, workflow, step and task, and for a command its command line
+and exit code. The arrow keys move the selection up and down.
+
+The header shows the run's wall time, working time, user wait and helper
+wait, the same figures as `stats run`, defined on the
+[Run statistics](/run-stats/) page.
+
+The side summary lists the longest steps and the longest gaps over the
+threshold. Choosing one zooms to it, so the slowest step and the longest
+stall are a click away.
+
+## For programs
+
+`--format json` reports what was written in the standard result envelope:
+
+```json
+{
+  "file": "/abs/spektacular-run-4bf92f35.html",
+  "rows": 1234,
+  "bytes": 412880,
+  "run": { "run_id": "4bf92f3577b34da6a3ce929d0e0e4736", "kind": "plan" },
+  "gap_threshold_ms": 300000,
+  "log_dir": "/abs/project/.spektacular/logs",
+  "skipped_lines": 0,
+  "error": false
+}
+```
+
+`rows` is the number of bars on the page, one per span and command, and
+`bytes` is the file's size. `--fields` narrows the output as for any other
+command.
+
+</Prose>
+
+<CtaBanner heading="Want the numbers instead?">
+  <Fragment slot="body">
+
+    The run statistics report gives the same run as figures: totals, steps,
+    tasks, helpers, waits and gaps.
+
+  </Fragment>
+  <Button
+    href="/run-stats/"
+    label="View run statistics →"
+    variant="primary"
+    large
+  />
+</CtaBanner>
