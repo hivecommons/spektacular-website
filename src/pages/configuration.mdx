@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Shell.astro
 title: "Configuration - Spektacular"
-description: "Configure Spektacular via .spektacular/config.yaml and a member repository's own .spektacular/repo.yaml: command, agent, auto_commit, log, spec, plan, knowledge, each repository's location, and where its code lives (source)."
+description: "Configure Spektacular via .spektacular/config.yaml and a member repository's own .spektacular/repo.yaml: command, agent, auto_commit, log, stats, spec, plan, knowledge, each repository's location, and where its code lives (source)."
 ---
 import Hero from "../components/sections/Hero.astro";
 import Section from "../components/sections/Section.astro";
@@ -47,6 +47,14 @@ import Button from "../components/Button.astro";
     retention: 10                 # most recent workflow runs kept
     config:
       directory: logs             # relative to the folder holding `config.yaml`
+
+  stats:
+    prices:                       # optional; per million tokens, no built-in prices
+      claude-opus-5-5:
+        input: 5.00
+        output: 25.00
+        cache_read: 0.50
+        cache_write: 6.25
 
   spec:
     provider: file
@@ -108,11 +116,11 @@ import Button from "../components/Button.astro";
 
   <Fragment slot="sub">
 
-    Seventeen top-level keys control the tool from `.spektacular/config.yaml`:
+    Eighteen top-level keys control the tool from `.spektacular/config.yaml`:
     `schema`, `written_by`, `skills_version`, `command`, `agent`,
     `spec_trigger_threshold`, `epic_split_threshold`, `auto_commit`, `log`,
-    `spec`, `plan`, `changelog`, `epic`, `implement`, `knowledge`, `design`,
-    and `repos`.
+    `stats`, `spec`, `plan`, `changelog`, `epic`, `implement`, `knowledge`,
+    `design`, and `repos`.
 
   </Fragment>
 
@@ -215,6 +223,20 @@ import Button from "../components/Button.astro";
       holding `config.yaml`. Defaults to `logs`.
 
     See [Logging and debugging](/debugging/) for what each level records.
+
+  </ConfigKey>
+
+  <ConfigKey name="stats" type="section" defaultValue="none">
+
+    Optional prices for the token costs `spektacular stats` reports.
+
+    - `stats.prices.<model>.input`, `.output`, `.cache_read` and
+      `.cache_write`: the price per million tokens of each type, all four
+      required and none negative. `<model>` is the model name exactly as the
+      report lists it.
+
+    No prices are built in, and `init` never writes this key. A model with no
+    price has an unknown cost. See [Run statistics](/run-stats/).
 
   </ConfigKey>
 

@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Shell.astro
 title: "Run statistics - Spektacular"
-description: "Report where a workflow run's time went, compare runs and summarise many, from Spektacular's own logs."
+description: "Report where a workflow run's time went, and for Claude Code runs the tokens and cost of each part, compare runs and summarise many, from Spektacular's own logs."
 ---
 import Hero from "../components/sections/Hero.astro";
 import Prose from "../components/sections/Prose.astro";
@@ -188,6 +188,110 @@ and counted, and leaves every other figure unchanged. The JSON gives the
 count as `skipped_lines`, and the tables end with `Skipped lines: N` when any
 line was skipped.
 
+## Tokens and cost
+
+For runs driven by Claude Code, every report also shows how many tokens each
+part of the run used, what that cost, and how much working time it took per
+thousand output tokens, beside its timings. The Steps, Tasks and Helpers
+tables gain three columns:
+
+```text
+STEP          ENTRIES  DURATION  ...  OUT TOKENS  COST  TIME/1K OUT
+discovery     1        12m04s    ...  48,210      3.12  15.0s
+architecture  1        9m40s     ...  2,105       0.41  4m35s
+```
+
+Architecture took almost as long as discovery but did a twentieth of the
+work, so it is the step to look at. After the Steps table, a `Tokens` block
+gives each step's input, output, cache-read and cache-write tokens and cost,
+the tokens used outside any step and the run total, then a `Models` table
+with each model's tokens and cost, and any unmatched helpers.
+
+## How a run finds its session
+
+Spektacular never sees the agent's model requests, so it reads Claude
+Code's own session files in `~/.claude/projects` (or
+`$CLAUDE_CONFIG_DIR/projects` when that is set). It looks at the sessions
+active since the run started, finds the one whose shell commands ran this
+run's own `new` and `goto` commands, and reads that session's helper agents
+too. A run resumed in a second session is read from both, and an
+orchestrated run is found in its own helper's transcript. The agent does
+nothing extra for this, and nothing has to be set up.
+
+```bash
+spektacular stats run --sessions-dir path/to/claude/projects
+```
+
+`--sessions-dir` reads Claude Code session files from another folder, such
+as a copy taken from another machine. Reading never changes those files.
+
+## What the token figures mean
+
+- **Input, output, cache read, cache write**: the four token types the model
+  reports for each request.
+- **Steps and tasks**: each request counts in the step and task that were
+  running when it was made.
+- **Helpers**: a helper's tokens, including any helper it started, count on
+  its launch and in the step and task it was launched in, even if it
+  finishes after that step has ended. A helper whose launch Spektacular
+  never recorded is still counted, in the step it started in, and listed as
+  unmatched.
+- **Outside any step**: requests made before the run's first step, between
+  the steps of an interrupted run, or after it finished, in the same
+  session. The step figures plus this figure always equal the run total.
+- **Session overhead**: tokens Claude Code counted for the session that its
+  transcript never records, such as permission checks. It is known only
+  when the session drove just this run and Claude Code has written its own
+  totals, and it is part of "outside any step". Otherwise the run total
+  covers the recorded requests only, and the report says why.
+- **Models**: each model the run used, with its tokens and cost.
+- **Time per 1k output tokens** (`TIME/1K OUT`): working time per thousand
+  output tokens. For the run it is the run's working time; for a step or a
+  task, its duration less any wait on you; for a helper, its own duration,
+  so helpers running at the same time do not affect each other. It shows as
+  `n/a` for a part with no output tokens.
+
+## Setting prices
+
+No prices are built in, because they change. Give each model's price per
+million tokens in `.spektacular/config.yaml`:
+
+```yaml
+stats:
+  prices:                  # per million tokens
+    claude-opus-5-5:
+      input: 5.00
+      output: 25.00
+      cache_read: 0.50
+      cache_write: 6.25
+```
+
+Keys are model names exactly as the report lists them, and all four prices
+are required. Costs are in whatever currency the table uses. A model with
+no price has an unknown cost, never zero. A total that includes one shows
+the cost of the priced part, marked incomplete: in the tables with a `*`
+after the cost and a note naming the unpriced models, and in the JSON with
+`"cost_complete": false` and the models in `unpriced_models`. With no price
+table at all, every cost is unknown.
+
+## When tokens are unknown
+
+When token use cannot be read, the token figures show as unknown with a
+reason, and every timing stays as it would be without them. The tables show
+`?` in the token columns and one line in the `Tokens` block; the JSON gives
+`"status": "unknown"` with `reason_code` and `reason`. The reasons are:
+
+- `agent_unsupported`: only Claude Code sessions are read today, so runs by
+  Bob, Codex and other agents show unknown.
+- `sessions_dir_missing`: the Claude Code projects folder does not exist.
+- `session_not_found`: no session ran this run's commands.
+- `session_unreadable`: a session file could not be read.
+- `format_unrecognised`: a session file holds nothing Spektacular
+  recognises, for example after a change to Claude Code's format.
+
+Comparisons show such a run as `-` for the token figures, and summaries
+leave it out of their counts.
+
 ## Reports for programs
 
 `--format json` gives the same report in the standard envelope. An abridged
@@ -207,6 +311,23 @@ example:
 Durations are integer milliseconds, times are RFC 3339 in UTC, and a figure
 that does not apply is `null`, never `0`. These field names are stable, and
 `--fields` narrows the output as for any other command.
+
+Token use comes as a `tokens` object on each `steps`, `tasks` and `helpers`
+row, and a top-level `tokens` section:
+
+```json
+"tokens": {
+  "status": "known",
+  "total": { "input": 1442, "output": 641466, "cache_read": 158466888, "cache_write": 2554795,
+             "cost": 43.18, "cost_complete": true, "unpriced_models": [], "working_ms_per_1k_output": 2811 }
+}
+```
+
+The section also holds `sessions`, `outside_steps`, `session_overhead`,
+`models` and `unmatched_helpers`. Comparisons and summaries add
+`input_tokens`, `output_tokens`, `cache_read_tokens`, `cache_write_tokens`,
+`cost` and `working_ms_per_1k_output` after their existing figures, for the
+totals and each step.
 `stats commands` and `stats spans` give their records the same way, in a
 `commands` or a `spans` array whose field names are stable too.
 
