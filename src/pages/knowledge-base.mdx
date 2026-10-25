@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Shell.astro
 title: "Knowledge Base - Spektacular"
-description: "What Spektacular's knowledge base is, the six categories it holds, and how entries are created, searched, configured, and kept up to date."
+description: "What Spektacular's knowledge base is, the six categories it holds, and how entries are created, searched, configured, kept up to date, and pruned."
 ---
 import Hero from "../components/sections/Hero.astro";
 import Section from "../components/sections/Section.astro";
@@ -113,9 +113,10 @@ import Button from "../components/Button.astro";
     --file ./db-timeouts.md
   ```
 
-  You rarely run this by hand. The `spek-knowledge` skill proposes the tier, the
-  store, the path, the tags and the body together, and waits for you to confirm
-  all of it before anything is written.
+  You rarely run this by hand. When an agent learns something durable while
+  working, it writes the entry itself through the `spek-knowledge` skill and
+  then tells you which entry it wrote, in which store and path, and why.
+  Nothing waits for your approval; your version history is the undo.
 
   The first segment of the path picks the category (`gotchas/db-timeouts.md`
   lands in `gotchas`) and the entry is stored as raw markdown at
@@ -146,7 +147,9 @@ import Button from "../components/Button.astro";
 
   **Keeping it up to date.** There is no separate update command: you write the
   entry again to the same tier, store name, and path, and the new content replaces
-  the old.
+  the old. The entry keeps its creation date and its usage history. To find
+  entries that are no longer used or no longer true, prune the knowledge base,
+  covered under Pruning the knowledge base below.
   Because entries are identified by the exact bytes of their content, rewriting
   the same text changes nothing, while genuinely edited text supersedes the
   previous version.
@@ -161,8 +164,8 @@ import Button from "../components/Button.astro";
 
   Naming a store the project has not declared is refused, and the refusal lists
   the stores available in that tier. Naming a path that simply holds nothing is
-  not an error: the removal reports success and changes nothing, so a maintenance
-  pass that retries is safe. The result says which of the two happened, so you can
+  not an error: the removal reports success and changes nothing, so a prune
+  that retries is safe. The result says which of the two happened, so you can
   tell a removal from a no-op without reading the store back.
 
   The one entry that cannot be removed is a category's own `README.md`. It is
@@ -171,6 +174,99 @@ import Button from "../components/Button.astro";
   `spektacular init`, which regenerates it. Removal is immediate and there is no
   undo, which is no worse than it sounds: every store in a normal setup is a
   directory under version control, so recovery is whatever git already gives you.
+
+  </Prose>
+
+</Section>
+
+<Section heading="How usage is recorded" surface>
+
+  <Fragment slot="sub">
+
+    Every store keeps a record of when each entry was created and how often it
+    is found and read, so you can see which knowledge earns its place.
+
+  </Fragment>
+
+  <Prose nested>
+
+  Each store keeps a usage index, `.usage-index.json`, at its root. It records
+  two kinds of use for every entry:
+
+  - **A discovery**, each time a `knowledge search` returns the entry.
+  - **A retrieval**, each time the entry is read with `knowledge read` or loaded
+    with the always-applied categories. A retrieval made while a workflow runs
+    names that workflow and its spec.
+
+  Each entry also carries a creation date, set by its first write and kept
+  through every later rewrite. Entries written before the index existed get one
+  automatically: from the commit that first added them when the store is under
+  git, and otherwise from the file's modification time. Their usage is tracked
+  from their first use after the upgrade. Parallel workflow runs update the
+  index under a lock, so no use is lost.
+
+  Read the index with `knowledge usage`, narrowed like the other commands:
+
+  ```bash
+  spektacular knowledge usage --tier repo --filter spektacular
+  ```
+
+  The index is written only by Spektacular. It never appears as an entry in a
+  listing or a search, and `knowledge write` refuses its path, as do
+  `knowledge read` and `knowledge delete`.
+
+  </Prose>
+
+</Section>
+
+<Section heading="Pruning the knowledge base">
+
+  <Fragment slot="sub">
+
+    Prune removes knowledge nobody uses, then has the agent check every
+    remaining entry against the project.
+
+  </Fragment>
+
+  <Prose nested>
+
+  Prune runs in two passes and acts without asking. Run it yourself, or ask the
+  `spek-knowledge` skill whether the knowledge base is still accurate.
+
+  **Pass one removes unused entries.** An entry is removed when it was created
+  more than `knowledge.prune.max_age_days` ago (90 by default), has been tracked
+  for at least that long, and has not been retrieved in that time. A discovery
+  does not keep it: an entry that searches keep surfacing but nobody reads is
+  still unused.
+
+  **Pass two checks every remaining entry.** The command hands the agent one
+  entry at a time, with its text, and the agent gives it a verdict:
+
+  - **current**: the entry still describes the project, or states a standard
+    the code has not met yet. An entry like that is kept unchanged, because in
+    this project an entry states the target and the code is what has yet to
+    meet it.
+  - **corrected**: the subject still exists but the entry describes it wrongly,
+    so the agent rewrites it.
+  - **deleted**: the entry's subject no longer exists, so the agent removes it.
+    Only an entry whose subject is gone is deleted.
+
+  Every correction and deletion needs evidence naming what the agent checked,
+  and the command checks each verdict against the store before it moves on. The
+  final report lists every entry as removed, corrected, deleted or current,
+  with the evidence for each change. A removed or deleted entry loses its usage
+  history; a corrected one keeps it.
+
+  ```bash
+  spektacular knowledge prune --dry-run
+  spektacular knowledge prune
+  spektacular knowledge prune verdict --data '{"tier":"repo","name":"spektacular","path":"gotchas/x.md","verdict":"current","evidence":"flag still exists in cmd/knowledge.go"}'
+  ```
+
+  The dry run is the preview: it produces the same report and changes no entry
+  and no usage record. Prune's own reads never count as usage. An interrupted
+  prune resumes where it stopped when you run it again, and `--force` starts it
+  over. Recovery from a prune is through your version history.
 
   </Prose>
 
@@ -336,9 +432,9 @@ import Button from "../components/Button.astro";
   because `route` is not a prefix of `routing`. Where a form is genuinely
   different rather than merely longer, carry both tags.
 
-  **You rarely write this block yourself.** The `spek-knowledge` skill proposes
-  tags when it captures an entry, and shows them alongside the destination for
-  you to confirm or edit before anything is written.
+  **You rarely write this block yourself.** The `spek-knowledge` skill chooses
+  tags from the vocabulary when it captures an entry, and tells you the tags it
+  chose alongside the destination once the entry is written.
 
   **Auditing the tags you already have.** Entries written before tags existed, or
   tagged carelessly, can be reviewed the same way. There is no separate command:
@@ -477,6 +573,18 @@ import Button from "../components/Button.astro";
   repository it is not touching. Because every store is just a directory of
   markdown files under its category folders, the whole knowledge base stays
   something you can read, edit, and version directly.
+
+  **How long unused knowledge is kept.** `knowledge.prune.max_age_days` in
+  `.spektacular/config.yaml` sets how many days an entry may go unretrieved
+  before `spektacular knowledge prune` removes it. It is optional and defaults
+  to 90:
+
+  ```yaml
+  # .spektacular/config.yaml
+  knowledge:
+    prune:
+      max_age_days: 90
+  ```
 
   </Prose>
 
