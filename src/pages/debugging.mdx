@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Shell.astro
 title: "Logging and debugging - Spektacular"
-description: "Spektacular logs every command it runs; see what each level records and where logs go."
+description: "Spektacular logs every command it runs; see what each level records, where logs go, and how spans time a run."
 ---
 import Hero from "../components/sections/Hero.astro";
 import Prose from "../components/sections/Prose.astro";
@@ -135,7 +135,128 @@ Here is a `standard` record of a `spec goto`:
     and `spektacular.state.before` / `spektacular.state.after`.
 
 A step's duration is the time between the commands that moved the workflow
-onto it and off it again.
+onto it and off it again. Its step span, below, records the same stretch.
+
+## Spans: where the time went
+
+A run's log shows more than its commands. Each workflow step and each plan
+task is a span, timed from the moment the workflow enters it to the moment
+it leaves, and every command is recorded under the step it ran in. Agents
+also mark the helper agents they start and the questions they ask the user.
+A plan run reads as `discovery` (12 minutes) holding its commands and two
+`sub-agent` spans, then `architecture`, and so on.
+
+## Span types
+
+Every span carries a `spektacular.span.type`:
+
+- `command`: one per command, recorded automatically.
+- `step`: each workflow step, from entering it to leaving it, recorded
+  automatically.
+- `task`: each plan task during implement, from `analyze` to
+  `update_changelog`, recorded automatically. Its step spans nest under it.
+- `sub-agent`: a helper agent, marked by the agent that launched it.
+- `user-wait`: time spent waiting for the user to answer, marked by the
+  agent. It is kept apart so it can be left out of a run's working time.
+- `work`: any other stretch the agent wants to time.
+
+## Marking spans
+
+Agents mark spans with two commands:
+
+```bash
+spektacular trace start test-writer --type sub-agent
+# {"span_id":"4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7", ...}
+spektacular trace stop 4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7
+spektacular trace stop <id> --status error --message "tests did not compile"
+```
+
+`trace start` takes a name, a `--type` of `sub-agent`, `user-wait` or `work`
+(the default), and prints the span's id, `<trace_id>-<span_id>`.
+`trace stop` takes that id and an optional `--status ok` or `--status error`
+with a `--message`.
+
+A span nests under the current step unless `--parent <id>` names another
+open span. Pass a helper agent its span's id, so the spans it starts nest
+under the span that launched it, even when several helpers run at once.
+Workflow instructions already tell agents when to do all this.
+
+A mistake is refused with a message saying what to do next, and records
+nothing: an unknown or already closed parent, an id never started or already
+stopped, a step or task span (Spektacular closes those itself), or a bad
+name, type, id or status. The trace commands never move the workflow.
+
+## How spans end
+
+A step ends when the workflow moves on, and the next step begins at the same
+moment. A span still open when its parent ends, or when the run finishes, is
+closed as `abandoned`. A step left open by a session that stopped is closed
+as `interrupted` when the run resumes, at the end of its last recorded
+command, together with any span still open under it; the resumed step then
+gets a new span. Restarting a run with `spec new --force` abandons the old
+run's open spans.
+
+With `log.level: off` the trace commands still succeed, and record nothing.
+
+## Span records
+
+A span that opens in one command and closes in another is written as two
+records: a `span_start` when it begins, and a `span_end` when it ends. Here
+is a step opening and closing:
+
+```json
+{
+  "record": "span_start",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "a3ce929d0e0e4736",
+  "name": "interview",
+  "kind": "internal",
+  "start_time": "2026-10-24T09:03:34.930000000Z",
+  "attributes": {
+    "spektacular.span.type": "step",
+    "spektacular.agent": "claude",
+    "spektacular.workflow.kind": "spec",
+    "spektacular.workflow.name": "000074_trace-spans",
+    "spektacular.step": "interview"
+  },
+  "resource": { "service.name": "spektacular", "service.version": "0.22.0" }
+}
+```
+
+```json
+{
+  "record": "span_end",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "a3ce929d0e0e4736",
+  "name": "interview",
+  "kind": "internal",
+  "start_time": "2026-10-24T09:03:34.930000000Z",
+  "end_time": "2026-10-24T09:11:02.417000000Z",
+  "status": { "code": "ok" },
+  "attributes": {
+    "spektacular.span.type": "step",
+    "spektacular.span.end_reason": "moved",
+    "spektacular.agent": "claude",
+    "spektacular.workflow.kind": "spec",
+    "spektacular.workflow.name": "000074_trace-spans",
+    "spektacular.step": "interview"
+  },
+  "resource": { "service.name": "spektacular", "service.version": "0.22.0" }
+}
+```
+
+- `record`: `span` for a command, `span_start` and `span_end` for a span
+  that crosses commands. A `span_end` repeats every field of its start, so it
+  is a complete span on its own; a `span_start` with no end is still open.
+- `parent_span_id`: the span this one nests under. A command's parent is its
+  step; a step's parent is its task, or none; an agent's span's parent is the
+  span it named, or the current step.
+- `spektacular.span.type`: one of the types above.
+- `spektacular.span.end_reason`: on a `span_end`, why it ended: `moved`,
+  `finished`, `stopped` (an agent's `trace stop`), `abandoned` or
+  `interrupted`. An abandoned or interrupted span has status `error` with the
+  reason as its message.
+- `spektacular.task.id`: on a task span, the plan task's id.
 
 ## Upgrading from debug mode
 
