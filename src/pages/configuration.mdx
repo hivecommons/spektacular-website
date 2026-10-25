@@ -83,6 +83,8 @@ import Button from "../components/Button.astro";
         config:
           location: ${HOME}/work/team-knowledge   # or ../../team-knowledge,
                                                   # relative to this file
+    prune:
+      max_age_days: 90              # optional; days an entry may go unretrieved
 
   design:
     sources:                        # where the project's design documents live;
@@ -339,7 +341,7 @@ import Button from "../components/Button.astro";
 
   </ConfigKey>
 
-  <ConfigKey name="knowledge" type="section" defaultValue="none">
+  <ConfigKey name="knowledge" type="section" defaultValue="none; <code>prune.max_age_days: 90</code>">
 
     Ordered list of the shared knowledge stores the project itself owns, such
     as a team handbook. Each repository declares its own store in its
@@ -352,6 +354,10 @@ import Button from "../components/Button.astro";
     - `knowledge.sources[].config.location`: where the file provider reads
       knowledge from. Relative paths resolve from the folder holding
       `config.yaml`, the same base a `repos` entry uses.
+    - `knowledge.prune.max_age_days`: how many days an entry may go
+      unretrieved before `spektacular knowledge prune` removes it. An entry
+      must also have been tracked for that long. Defaults to 90 when absent;
+      must be positive.
 
   </ConfigKey>
 
