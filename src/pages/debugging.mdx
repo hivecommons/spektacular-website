@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Shell.astro
-title: "Debugging - Spektacular"
-description: "Enable Spektacular's JSONL audit log to see exactly what the CLI did on every command."
+title: "Logging and debugging - Spektacular"
+description: "Spektacular logs every command it runs; see what each level records and where logs go."
 ---
 import Hero from "../components/sections/Hero.astro";
 import Prose from "../components/sections/Prose.astro";
@@ -9,88 +9,147 @@ import CtaBanner from "../components/sections/CtaBanner.astro";
 import Button from "../components/Button.astro";
 
 <Hero
-  heading="Debugging"
-  sub="See what Spektacular (Spek) is doing under the hood, one JSON line per command."
+  heading="Logging and debugging"
+  sub="Every Spektacular command leaves one JSON line, so you can see exactly what happened in a run."
 />
 
 <Prose>
 
-## Enabling debug logging
+## Logging is on by default
 
-Debug logging is off by default. Every project scaffolded by `spektacular
-init` already has the key in `.spektacular/config.yaml`, just set to
-`false`. Turn it on by editing that file:
+Every `spektacular` command run in a project is recorded to
+`.spektacular/logs/`, with nothing to switch on. The folder is already
+ignored by git: `spektacular init` adds it to `.spektacular/.gitignore`,
+`spektacular migrate` adds it to projects set up by an earlier version, and
+the folder holds its own `.gitignore` as well, so logs are never committed
+by accident.
+
+The `log` section of `.spektacular/config.yaml` controls it:
 
 ```yaml
-debug:
-  enabled: true
+log:
+  provider: file        # the logger; only file ships today
+  level: standard       # off | standard | verbose
+  retention: 10         # most recent workflow runs kept
+  config:
+    directory: logs     # relative to the folder holding config.yaml
 ```
 
-To record a session without editing the config, set
-`SPEKTACULAR_SESSION_LOG=on` in the environment your agent runs in. Every
-`spektacular` command it runs is recorded, whatever `debug.enabled` says.
-Setting it to `off` does the opposite: a command run with it is left out
-of the log even when debug logging is on, which suits a tool that polls
-`status` every few seconds.
+Nothing is recorded outside a project, so a command run in a repo's code
+checkout never leaves a log behind.
 
-## What gets logged
+## What each level records
 
-Once enabled, every `spektacular` command appends one line to a session
-log file under `.spektacular/debug/`. Each spec, plan or implement
-workflow gets its own file, named for when it started, the agent the
-project is set up for, and the workflow, for example
-`20261001T090334.911373161Z_claude_plan_000008_debugging-docs.jsonl`.
-Commands run with no workflow in progress share a `no-active-workflow`
-file. When an epic is planned or implemented, each spec's workflow runs
-in its own lane and writes its own file, so specs worked on side by side
-never share one. Starting a workflow again, for example with `--force`,
-begins a new file. Files are never truncated or rotated: each command
-adds one more line.
+- `standard` (the default): for each command, its name and arguments, the
+  run it belongs to, the agent, the workflow and the step it ran in (and the
+  step it moved the workflow to), when it started and ended, its exit status
+  and, when it failed, the error message. It keeps no responses, so the log
+  stays small.
+- `verbose`: everything `standard` records, plus the command's full response
+  and the workflow state before and after it, as debug mode did. Use it when
+  reporting an issue or reproducing a problem; verbose logs grow quickly.
+- `off`: nothing is recorded. To switch logging off, set
+  `log.level: off` in `.spektacular/config.yaml`.
 
-Here's a real sample line:
+## Where logs go
+
+Each workflow run gets a file of its own, named for when the run started,
+the agent the project is set up for, and the workflow, for example
+`20261024T090334.911373161Z_claude_plan_000008_debugging-docs.jsonl`. Every
+command of that run lands in it, across interruptions and resumes. When an
+epic is planned or implemented, each spec's workflow is its own run, so
+specs worked on side by side never share a file. Restarting a workflow with
+`--force` starts a new run and a new file.
+
+Commands run while no workflow is in progress go to one file per day, for
+example `standalone_20261024.jsonl`.
+
+To write logs somewhere else, set `log.config.directory`. A relative path is
+resolved from the folder holding `config.yaml` (`.spektacular/`); an
+absolute path is used as written.
+
+## How long logs are kept
+
+Spektacular keeps the logs of the 10 most recent workflow runs, or the
+number set in `log.retention`, and deletes older ones when a new run starts.
+Days of standalone commands are counted separately, with the same number of
+most recent days kept, so a burst of standalone commands never pushes out a
+workflow run's log. A log that cannot be deleted is skipped: logging never
+changes a command's output or exit code.
+
+## Commands that are never logged
+
+`spektacular status` is never logged, at any level, so editors and tools
+that poll it every few seconds do not fill the log. Commands that only
+report on the project or its logs are never logged either: the run
+statistics reports of `spektacular stats`, and every form of them, leave no
+record, so a report never adds to or trims the logs it reads.
+
+The level is set in `config.yaml` only: there is no environment variable for
+it.
+
+## Reading a record
+
+Each line is one JSON record following the OpenTelemetry trace data model.
+Here is a `standard` record of a `spec goto`:
 
 ```json
 {
-  "seq": 0,
-  "timestamp": "2026-07-03T11:31:53.075772108+01:00",
-  "session_id": "no-active-workflow",
-  "command": ["knowledge", "sources"],
-  "duration_ms": 0,
-  "exit_code": 0,
-  "response": "{...full JSON stdout response as a string...}",
-  "state_before": null,
-  "state_after": null,
-  "advanced": false
+  "record": "span",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "name": "spec goto",
+  "kind": "internal",
+  "start_time": "2026-10-24T09:03:34.911373161Z",
+  "end_time": "2026-10-24T09:03:34.934002113Z",
+  "status": { "code": "ok" },
+  "attributes": {
+    "spektacular.span.type": "command",
+    "spektacular.agent": "claude",
+    "spektacular.workflow.kind": "spec",
+    "spektacular.workflow.name": "000073_log-mode",
+    "spektacular.step": "interview",
+    "spektacular.step.to": "overview",
+    "process.command_args": ["spec", "goto", "--data", "{\"step\":\"overview\"}"],
+    "process.exit_code": 0
+  },
+  "resource": { "service.name": "spektacular", "service.version": "0.21.0" }
 }
 ```
 
-- `seq`: this line's position in the file, starting at 0.
-- `timestamp`: when the command ran.
-- `session_id`: `"no-active-workflow"` when no spec, plan, or implement
-  workflow is in progress, or `"<kind>:<name>"` (for example
-  `"plan:000008_debugging-docs"`) when one is active.
-- `command`: the CLI arguments the command was invoked with.
-- `duration_ms`: how long the command took to run.
-- `exit_code`: the command's exit code.
-- `response`: the command's full JSON output, as a string.
-- `state_before` / `state_after`: the workflow's state before and after
-  this command, or `null` when no workflow is active.
-- `advanced`: whether this command moved the workflow state machine
-  forward.
+- `trace_id`: the run the command belongs to. Every command of one workflow
+  run shares it; a command outside any workflow gets its own.
+- `span_id`: this command's own id.
+- `name`: the command, such as `spec goto`.
+- `start_time` / `end_time`: when the command started and ended, in UTC.
+- `status`: `ok`, or `error` with the error `message`.
+- `attributes`:
+  - `spektacular.agent`: the agent named in `config.yaml`, or `unknown`.
+  - `spektacular.workflow.kind` / `spektacular.workflow.name`: the workflow,
+    absent for a command outside one.
+  - `spektacular.step`: the step the command ran in.
+  - `spektacular.step.to`: the step it moved the workflow to, when it moved.
+  - `process.command_args`: the arguments the command was run with.
+  - `process.exit_code`: the command's exit code.
+  - At the `verbose` level, also `spektacular.response` (the full output)
+    and `spektacular.state.before` / `spektacular.state.after`.
 
-## Before you enable it
+A step's duration is the time between the commands that moved the workflow
+onto it and off it again.
 
-The default `.spektacular/.gitignore` ignores `*.log`, but session log
-files end in `.jsonl`, so that pattern doesn't match them. If you enable
-debug logging, consider adding `.spektacular/debug/` to your own
-project's `.gitignore` so the growing log files don't end up committed.
+## Upgrading from debug mode
+
+Debug mode is replaced by logging. `spektacular migrate` turns
+`debug.enabled: true` into `log.level: verbose`, and `false` (or no debug
+setting) into `standard`. Old files in `.spektacular/debug/` are left where
+they are, untouched; delete them when you no longer need them.
 
 </Prose>
 
 <CtaBanner heading="More on configuration">
   <Fragment slot="body">
 
-    The `debug` key is one of several top-level sections in
+    The `log` key is one of several top-level sections in
     `.spektacular/config.yaml`, see the Configuration page for the rest.
 
   </Fragment>
