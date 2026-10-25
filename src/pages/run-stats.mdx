@@ -1,0 +1,210 @@
+---
+layout: ../layouts/Shell.astro
+title: "Run statistics - Spektacular"
+description: "Report where a workflow run's time went, compare runs and summarise many, from Spektacular's own logs."
+---
+import Hero from "../components/sections/Hero.astro";
+import Prose from "../components/sections/Prose.astro";
+import CtaBanner from "../components/sections/CtaBanner.astro";
+import Button from "../components/Button.astro";
+
+<Hero
+  heading="Run statistics"
+  sub="Ask Spektacular where a run's time went: in each step and task, waiting on helper agents, or waiting on you."
+/>
+
+<Prose>
+
+## Listing runs
+
+`spektacular stats list` reads the project's logs, `.spektacular/logs/` by
+default, and shows each workflow run they hold, newest first: its kind,
+workflow name, agent, start time, wall time and status.
+
+```text
+RUN       KIND       NAME                      AGENT   STARTED              WALL    STATUS
+4bf92f35  implement  000075_run-stats-command  claude  2026-10-25 09:10:02  41m12s  in_progress
+9d0e0e47  plan       000075_run-stats-command  claude  2026-10-25 08:20:50  41m21s  finished
+```
+
+A run is `finished` once it reached its last step, and `interrupted` when it
+was restarted or a later run of the same workflow started after it. Any
+other run is `in_progress`. The `RUN` column shows the first 8 characters of
+the run id, which the other commands accept with `--run` as long as no
+other run's id starts the same way. Commands
+run outside any workflow are not runs, and are not listed.
+
+## Reporting on one run
+
+`spektacular stats run` reports on the run that started most recently. It
+gives the run's totals, then a table per step, the plan tasks of an
+implement run, every helper agent launched, every wait on the user, and the
+longest gaps between recorded events.
+
+```text
+plan 000075_run-stats-command  agent claude  run 9d0e0e47  finished  started 2026-10-25 08:20:50
+
+Wall time        41m21s
+Working time     30m03s
+User wait        11m18s  (2 waits)
+Helper wait      8m32s   (3 helpers)
+Command time     4.1s    (61 commands)
+Gaps over 5m00s  25m20s  (3 gaps)
+
+Steps
+STEP          ENTRIES  DURATION  COMMANDS  CMD TIME  HELPER WAIT  USER WAIT  INCOMPLETE
+discovery     2        13m32s    9         0.6s      6m42s        0.0s       1
+architecture  1        9m10s     6         0.4s      1m50s        4m05s      0
+```
+
+The report goes on with the `Tasks` table (when the run has plan tasks, as
+an implement run does), `Helpers`
+and `User waits` (each with its name, step, start, duration and how it
+ended) and `Longest gaps` (each with its length, its step and the events
+either side). `--gaps 3` lists 3 gaps instead of the default 10, and
+`--gap-threshold 30m` totals only the gaps longer than 30 minutes instead of
+5.
+
+## Choosing runs
+
+Every `stats` command takes the same selection, and the options combine:
+a run must match all of them.
+
+- `--name <workflow name>`: runs of one spec, plan or implement workflow.
+- `--kind spec|plan|implement|repo`: runs of one kind.
+- `--agent <agent>`: runs by one agent.
+- `--run <id>`: one run, by its full id or its first 8 or more characters.
+  Repeat it to name several runs.
+
+With no selection, `stats run` takes the latest run, `stats compare` takes
+the two latest runs of that run's kind, and `stats summary` takes every run
+of that kind. A prefix that matches more than one run is refused, with the
+runs it matches.
+
+## Comparing runs
+
+```bash
+spektacular stats compare --run 9d0e0e47 --run 4bf92f35
+```
+
+`stats compare` puts runs side by side in the order given, the first one as
+the base. Each step's duration is shown for every run, with each later run's
+difference from the base in time and percent, and the totals follow in the
+same form.
+
+```text
+STEP       9d0e0e47 2026-10-25  4bf92f35 2026-10-25
+interview  13m32s               10m01s (-3m31s, -26.0%)
+split      4m10s                -
+```
+
+A step a run never entered shows as `-`, not `0s`, and a difference against
+a base of zero has no percentage.
+
+## Summarising runs
+
+```bash
+spektacular stats summary --kind implement
+```
+
+`stats summary` gives, for each step and for the totals, the number of runs
+it covers, the median and the 90th percentile. A step only some runs entered
+shows how many did. The 90th percentile is the nearest-rank value, so it is
+always a figure one of the runs had.
+
+## What each figure means
+
+- **Wall time**: from the run's first recorded event to its last. A run
+  still in progress is measured to its latest event.
+- **Working time**: wall time less user wait.
+- **User wait**: time a `user-wait` span was open and finished, counted once
+  when several overlap.
+- **Helper wait**: time at least one `sub-agent` span was running, counted
+  once when helpers overlap, so it never adds up to more than the wall time.
+- **Command time** (`CMD TIME` per step): the time Spektacular's own
+  commands took. It stands in for tool time; the logs hold no model time.
+- **Commands**: how many Spektacular commands ran, in the whole run or, per
+  step, in that step. The count beside command time in the totals is the
+  same figure.
+- **Duration** (per step or task): the time from entering it to leaving it,
+  added up over every entry.
+- **Entries**: how many times a step was entered.
+- **Incomplete**: how many of a step's entries did not end by moving on to
+  the next step or finishing the run, such as an `interrupted` entry or the
+  step a run is still in.
+- **Helpers** and **waits** (the counts beside helper wait and user wait):
+  how many helper agents were launched and how many times the user was
+  waited on, finished or not.
+- **Gap**: a stretch with no recorded event and no command running,
+  labelled with the step it fell in and the events either side. Time spent
+  waiting on a helper or on you is often a gap whose earlier event is the
+  `start` of that span, so the labels tell waiting from idle.
+- **Gap total**: the time in gaps longer than the threshold (5 minutes by
+  default). The count beside it is how many gaps were longer than the
+  threshold.
+
+## Unfinished work and damaged lines
+
+Work that was `interrupted`, `abandoned` or never closed (`open`) is
+flagged. In the tables, a task, helper or wait on the user that did not
+finish has a `*` after how it ended, and a step's `INCOMPLETE` column counts
+its entries that did not finish. In the JSON, every step entry
+(`step_entries`), task, helper and wait carries its `end_reason` and
+`"complete": false` when it did not finish, and each step row carries the
+same `incomplete` count. An interrupted step counts up to where it was cut
+off. Unfinished helpers and waits are listed, but left out of every
+wait total. A restart that closes a run's leftover spans days later does not
+stretch the run: those closing times are not counted as events.
+
+A line that cannot be read, such as a partly written last line, is skipped
+and counted, and leaves every other figure unchanged. The JSON gives the
+count as `skipped_lines`, and the tables end with `Skipped lines: N` when any
+line was skipped.
+
+## Reports for programs
+
+`--format json` gives the same report in the standard envelope. An abridged
+example:
+
+```json
+{
+  "error": false,
+  "log_dir": "/home/me/project/.spektacular/logs",
+  "skipped_lines": 0,
+  "run": { "run_id": "9d0e0e4736a3ce929d0e0e47364bf92f", "kind": "plan", "wall_ms": 2481277, "status": "finished" },
+  "totals": { "wall_ms": 2481277, "working_ms": 1803000, "user_wait_ms": 678277, "helper_wait_ms": 512000, "gap_ms": 1520000 },
+  "steps": [{ "step": "discovery", "entries": 2, "duration_ms": 812000 }]
+}
+```
+
+Durations are integer milliseconds, times are RFC 3339 in UTC, and a figure
+that does not apply is `null`, never `0`. These field names are stable, and
+`--fields` narrows the output as for any other command.
+
+## Logs from elsewhere
+
+```bash
+spektacular stats run --dir path/to/collected/logs
+```
+
+`--dir` reads a logs directory copied from anywhere, such as a test run's,
+from any folder, with no project needed, and gives the same figures as
+reporting in the project. Reporting never changes a log, and `stats`
+commands are never logged themselves.
+
+</Prose>
+
+<CtaBanner heading="Where do these records come from?">
+  <Fragment slot="body">
+
+    Every command, step, task and agent span the report reads is described
+    on the Logging and debugging page.
+
+  </Fragment>
+  <Button
+    href="/debugging/"
+    label="View logging and debugging →"
+    variant="primary"
+    large
+  />
+</CtaBanner>
