@@ -1,0 +1,153 @@
+{
+  "version": 1,
+  "entries": {
+    "conventions/alternate-section-background.md": {
+      "created": "2026-07-30T09:34:38Z",
+      "tracked_since": "2026-10-25T14:43:01.634517108Z",
+      "discoveries": {
+        "count": 0
+      },
+      "retrievals": {
+        "count": 2,
+        "last": "2026-10-25T18:16:42.304949543Z",
+        "recent": [
+          {
+            "at": "2026-10-25T14:43:01.634517108Z",
+            "workflow": "implement",
+            "spec": "000075_run-stats-command"
+          },
+          {
+            "at": "2026-10-25T18:16:42.304949543Z",
+            "workflow": "implement",
+            "spec": "000077_html-log-viewer"
+          }
+        ]
+      }
+    },
+    "conventions/file-scoped-section-headings.md": {
+      "created": "2026-08-14T12:13:21Z",
+      "tracked_since": "2026-10-25T14:43:01.634517108Z",
+      "discoveries": {
+        "count": 0
+      },
+      "retrievals": {
+        "count": 2,
+        "last": "2026-10-25T18:16:42.304949543Z",
+        "recent": [
+          {
+            "at": "2026-10-25T14:43:01.634517108Z",
+            "workflow": "implement",
+            "spec": "000075_run-stats-command"
+          },
+          {
+            "at": "2026-10-25T18:16:42.304949543Z",
+            "workflow": "implement",
+            "spec": "000077_html-log-viewer"
+          }
+        ]
+      }
+    },
+    "conventions/mdx-authoring.md": {
+      "created": "2026-05-27T16:07:53Z",
+      "tracked_since": "2026-10-25T14:43:01.634517108Z",
+      "discoveries": {
+        "count": 0
+      },
+      "retrievals": {
+        "count": 2,
+        "last": "2026-10-25T18:16:42.304949543Z",
+        "recent": [
+          {
+            "at": "2026-10-25T14:43:01.634517108Z",
+            "workflow": "implement",
+            "spec": "000075_run-stats-command"
+          },
+          {
+            "at": "2026-10-25T18:16:42.304949543Z",
+            "workflow": "implement",
+            "spec": "000077_html-log-viewer"
+          }
+        ]
+      }
+    },
+    "conventions/no-em-dashes.md": {
+      "created": "2026-06-23T16:50:54Z",
+      "tracked_since": "2026-10-25T14:43:01.634517108Z",
+      "discoveries": {
+        "count": 0
+      },
+      "retrievals": {
+        "count": 2,
+        "last": "2026-10-25T18:16:42.304949543Z",
+        "recent": [
+          {
+            "at": "2026-10-25T14:43:01.634517108Z",
+            "workflow": "implement",
+            "spec": "000075_run-stats-command"
+          },
+          {
+            "at": "2026-10-25T18:16:42.304949543Z",
+            "workflow": "implement",
+            "spec": "000077_html-log-viewer"
+          }
+        ]
+      }
+    },
+    "conventions/plan-content-pages.md": {
+      "created": "2026-07-03T11:19:41Z",
+      "tracked_since": "2026-10-25T14:43:01.634517108Z",
+      "discoveries": {
+        "count": 0
+      },
+      "retrievals": {
+        "count": 2,
+        "last": "2026-10-25T18:16:42.304949543Z",
+        "recent": [
+          {
+            "at": "2026-10-25T14:43:01.634517108Z",
+            "workflow": "implement",
+            "spec": "000075_run-stats-command"
+          },
+          {
+            "at": "2026-10-25T18:16:42.304949543Z",
+            "workflow": "implement",
+            "spec": "000077_html-log-viewer"
+          }
+        ]
+      }
+    },
+    "conventions/site-layout.md": {
+      "created": "2026-09-09T13:23:34Z",
+      "tracked_since": "2026-10-25T14:43:01.634517108Z",
+      "discoveries": {
+        "count": 0
+      },
+      "retrievals": {
+        "count": 2,
+        "last": "2026-10-25T18:16:42.304949543Z",
+        "recent": [
+          {
+            "at": "2026-10-25T14:43:01.634517108Z",
+            "workflow": "implement",
+            "spec": "000075_run-stats-command"
+          },
+          {
+            "at": "2026-10-25T18:16:42.304949543Z",
+            "workflow": "implement",
+            "spec": "000077_html-log-viewer"
+          }
+        ]
+      }
+    },
+    "decisions/frame-width-flow.md": {
+      "created": "2026-09-09T13:23:34Z",
+      "tracked_since": "2026-10-25T14:43:01.634517108Z",
+      "discoveries": {
+        "count": 0
+      },
+      "retrievals": {
+        "count": 0
+      }
+    }
+  }
+}
