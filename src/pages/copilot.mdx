@@ -1,0 +1,58 @@
+---
+layout: ../layouts/Shell.astro
+title: "GitHub Copilot CLI - Spektacular"
+description: "Set up Spektacular workflows for GitHub Copilot CLI, including shared projects and migration from the workaround."
+---
+
+# GitHub Copilot CLI
+
+Install [GitHub Copilot CLI](https://docs.github.com/copilot/how-tos/copilot-cli),
+complete its sign-in setup, and initialise your project:
+
+```bash
+cd my-project
+spektacular init copilot
+copilot
+```
+
+Setup installs six skills under `.github/skills/` and Spektacular's standing-rule
+sections in root `AGENTS.md`. Existing content outside those sections stays.
+No extra instruction file, command wrapper, or user-level settings are written.
+This integration covers Copilot CLI, not editor Copilot or the cloud agent.
+
+Inside an interactive Copilot session, invoke `/spek-new add user auth` to start
+a specification. The text after the command reaches the skill. The other
+workflows are `/spek-plan`, `/spek-implement`, `/spek-knowledge`,
+`/spek-manage-repos`, and `/spek-design`.
+
+## Limits
+
+Start Copilot in the project's **top folder**: Spektacular commands do not
+search parent directories. Non-interactive prompts such as
+`copilot -p "/spek-new add user auth"` do **not** expand slash commands; start
+workflows inside a session instead.
+
+Copilot loads `AGENTS.md` alongside your own instruction files. If a top-level
+`CLAUDE.md` imports `@AGENTS.md`, the rules arrive twice: once directly and once
+through the import. Claude Code setup creates this import; Copilot setup does
+not. Spektacular leaves other agents' instruction files unchanged.
+
+## Shared projects
+
+Copilot lists each workflow skill once and prefers the copy installed in
+`.github/skills/` over `.agents/skills/` or `.claude/skills/`, even if those
+copies differ. Running `spektacular init copilot` records `copilot` as the
+project's agent while preserving other agents' files.
+
+Upgrades with `spektacular migrate` refresh only the recorded agent's files;
+the others can fall behind. After upgrading, run `spektacular init <agent>`
+once for each agent used on the project. The last init determines the recorded
+agent.
+
+## Moving from the workaround
+
+If you ran `init claude` or `init codex` only so Copilot could discover the
+skills, run `spektacular init copilot`. The earlier agent's files remain; remove
+them manually if you do not use that agent. **Keep `AGENTS.md`**, which is shared.
+On a project previously set up for Claude Code, the rules stay doubled as long
+as a top-level `CLAUDE.md` importing `AGENTS.md` remains.
